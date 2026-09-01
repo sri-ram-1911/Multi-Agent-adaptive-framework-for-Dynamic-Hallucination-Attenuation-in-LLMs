@@ -1,0 +1,7 @@
+{
+  "title": "ACME Cloud — Service Level Agreement",
+  "source": "product-doc",
+  "authority": 0.95,
+  "published_at": "2025-09-20",
+  "text": "The ACME Cloud SLA guarantees 99.9% monthly uptime for the Standard tier and 99.95% for the Enterprise tier, measured as the percentage of successful control-plane and data-plane requests in a calendar month, excluding scheduled maintenance announced at least 72 hours in advance. If monthly uptime falls below the target, customers may claim service credits: 10% of the monthly fee for uptime between 99.0% and the target, 25% for uptime between 95.0% and 99.0%, and 50% for uptime below 95.0%. Credits must be requested within 30 days of the incident and are applied to a future invoice. Credits are the sole remedy for availability failures. The SLA does not cover outages caused by customer misconfiguration, third-party services, or force majeure."
+}

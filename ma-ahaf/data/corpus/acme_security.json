@@ -1,0 +1,7 @@
+{
+  "title": "ACME Cloud — Security and Compliance Overview",
+  "source": "product-doc",
+  "authority": 0.9,
+  "published_at": "2025-10-05",
+  "text": "ACME Cloud encrypts customer data at rest using AES-256 and in transit using TLS 1.2 or higher. The platform is certified for SOC 2 Type II and ISO/IEC 27001. Customer data is logically isolated per tenant; Enterprise customers may additionally request a dedicated database instance. Access to production systems requires hardware-backed multi-factor authentication and is logged. Data residency options are available for the EU and US regions; data does not leave the selected region except for aggregated, de-identified telemetry. Sub-processors are listed on the trust page and customers are notified 30 days before a new sub-processor is added. ACME does not train shared machine-learning models on customer content."
+}

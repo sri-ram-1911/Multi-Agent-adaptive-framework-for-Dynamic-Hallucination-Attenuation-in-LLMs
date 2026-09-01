@@ -1,0 +1,7 @@
+{
+  "title": "ACME Cloud — Data Retention and Deletion",
+  "source": "product-doc",
+  "authority": 0.9,
+  "published_at": "2025-08-12",
+  "text": "When a customer deletes a resource, ACME Cloud removes it from active systems immediately and purges it from encrypted backups within 35 days. When an account is closed, all customer content is deleted within 30 days, except where retention is legally required. Audit logs are retained for 12 months on Standard and 24 months on Enterprise. Customers can export their data at any time via the API or the console before closing an account. De-identified operational metrics (request counts, error rates) are retained indefinitely and cannot be attributed to an individual. Customers on a data-residency plan have backups stored only in their selected region."
+}

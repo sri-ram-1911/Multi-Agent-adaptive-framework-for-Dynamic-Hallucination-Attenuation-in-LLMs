@@ -1,0 +1,7 @@
+{
+  "title": "HTTP Status Codes — Common Reference",
+  "source": "reference",
+  "authority": 0.9,
+  "published_at": "2022-03-01",
+  "text": "HTTP response status codes are grouped into five classes. 1xx are informational. 2xx indicate success: 200 OK, 201 Created, 204 No Content. 3xx indicate redirection: 301 Moved Permanently, 302 Found, 304 Not Modified. 4xx indicate client errors: 400 Bad Request, 401 Unauthorized (authentication required), 403 Forbidden (authenticated but not allowed), 404 Not Found, 409 Conflict, 422 Unprocessable Entity, 429 Too Many Requests. 5xx indicate server errors: 500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout. A 401 differs from a 403 in that 401 means the request lacked valid credentials, whereas 403 means the credentials were valid but insufficient."
+}

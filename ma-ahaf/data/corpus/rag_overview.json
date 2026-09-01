@@ -1,0 +1,7 @@
+{
+  "title": "Retrieval-Augmented Generation — Concept Note",
+  "source": "reference",
+  "authority": 0.8,
+  "published_at": "2024-09-01",
+  "text": "Retrieval-Augmented Generation (RAG) combines a parametric language model with a non-parametric retrieval component. At query time the system retrieves relevant passages from an external corpus, places them in the model context, and conditions generation on them. RAG reduces hallucination on knowledge-intensive tasks because answers can be grounded in and cited to retrieved evidence, and the knowledge can be updated without retraining the model. Limitations include sensitivity to retrieval quality, a tendency to still hallucinate when retrieved context is irrelevant or contradictory, limited multi-hop reasoning, and added latency and cost. Hybrid retrieval (combining dense vector search with lexical search) and re-ranking with a cross-encoder typically improve retrieval precision."
+}

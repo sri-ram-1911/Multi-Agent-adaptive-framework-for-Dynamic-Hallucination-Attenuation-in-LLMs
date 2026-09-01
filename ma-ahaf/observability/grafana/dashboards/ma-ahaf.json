@@ -1,0 +1,48 @@
+{
+  "title": "MA-AHAF Overview",
+  "uid": "ma-ahaf",
+  "schemaVersion": 39,
+  "time": {"from": "now-6h", "to": "now"},
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "timeseries", "title": "Request latency (s)", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [
+        {"expr": "histogram_quantile(0.5, sum(rate(maahaf_request_latency_seconds_bucket[5m])) by (le))", "legendFormat": "p50"},
+        {"expr": "histogram_quantile(0.95, sum(rate(maahaf_request_latency_seconds_bucket[5m])) by (le))", "legendFormat": "p95"}
+      ]
+    },
+    {
+      "type": "timeseries", "title": "Requests by action", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [{"expr": "sum by (action) (rate(maahaf_requests_total[5m]))", "legendFormat": "{{action}}"}]
+    },
+    {
+      "type": "timeseries", "title": "LLM tokens/s by role", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [{"expr": "sum by (role) (rate(maahaf_tokens_total[5m]))", "legendFormat": "{{role}}"}]
+    },
+    {
+      "type": "timeseries", "title": "Estimated LLM cost (USD, cumulative)", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [{"expr": "sum(maahaf_llm_cost_usd_total)", "legendFormat": "usd"}]
+    },
+    {
+      "type": "timeseries", "title": "Agent latency p95 (s)", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [{"expr": "histogram_quantile(0.95, sum(rate(maahaf_agent_latency_seconds_bucket[5m])) by (le, agent))", "legendFormat": "{{agent}}"}]
+    },
+    {
+      "type": "stat", "title": "Abstain + escalate rate", "gridPos": {"h": 8, "w": 6, "x": 12, "y": 16},
+      "targets": [{"expr": "sum(rate(maahaf_abstentions_total{kind=~\"abstain|escalate\"}[15m])) / clamp_min(sum(rate(maahaf_abstentions_total[15m])), 0.001)"}]
+    },
+    {
+      "type": "gauge", "title": "Last agent disagreement", "gridPos": {"h": 8, "w": 6, "x": 18, "y": 16},
+      "targets": [{"expr": "maahaf_agent_disagreement"}]
+    },
+    {
+      "type": "timeseries", "title": "Max claim hallucination risk (histogram avg)", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+      "targets": [{"expr": "sum(rate(maahaf_max_claim_risk_sum[5m])) / clamp_min(sum(rate(maahaf_max_claim_risk_count[5m])), 0.001)", "legendFormat": "avg max risk"}]
+    },
+    {
+      "type": "timeseries", "title": "Verification depth (avg)", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+      "targets": [{"expr": "sum(rate(maahaf_verification_depth_sum[5m])) / clamp_min(sum(rate(maahaf_verification_depth_count[5m])), 0.001)", "legendFormat": "depth"}]
+    }
+  ]
+}

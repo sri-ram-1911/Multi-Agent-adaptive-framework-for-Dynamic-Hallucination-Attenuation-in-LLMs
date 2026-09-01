@@ -1,0 +1,7 @@
+{
+  "title": "GDPR — Core Concepts (Informational)",
+  "source": "reference",
+  "authority": 0.75,
+  "published_at": "2023-02-01",
+  "text": "The EU General Data Protection Regulation (GDPR) applies to the processing of personal data of individuals in the EU. It defines roles of data controller and data processor, and lawful bases for processing including consent, contract, legal obligation, vital interests, public task, and legitimate interests. Data subjects have rights including access, rectification, erasure, restriction, portability, and objection. Controllers must report certain personal data breaches to the supervisory authority within 72 hours of becoming aware. Maximum administrative fines are the higher of 20 million euro or 4% of global annual turnover for the most serious infringements. This note is a general summary and is not legal advice."
+}

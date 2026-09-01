@@ -1,0 +1,7 @@
+{
+  "title": "ACME Cloud — Refund and Cancellation Policy",
+  "source": "product-doc",
+  "authority": 0.95,
+  "published_at": "2025-11-01",
+  "text": "ACME Cloud subscriptions can be cancelled at any time from the billing dashboard. Monthly plans: cancellation stops the next renewal; the current paid period remains active until its end date and is not pro-rated. Annual plans: a full refund is available within 14 days of the initial purchase or renewal; after 14 days, annual plans are non-refundable but remain active until the end of the term. Usage-based charges (egress, overage compute) already incurred are always billed and are never refunded. Refunds are issued to the original payment method within 5 to 10 business days. Enterprise agreements are governed by the signed order form, which supersedes this policy. To request a refund, open a billing ticket with the invoice number."
+}

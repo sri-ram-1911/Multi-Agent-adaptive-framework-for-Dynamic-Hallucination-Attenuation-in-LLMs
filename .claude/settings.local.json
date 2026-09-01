@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m venv .venv)",
+      "Bash(./.venv/Scripts/python.exe -m pip install -q --upgrade pip)",
+      "Bash(./.venv/Scripts/python.exe -m pytest -q)",
+      "Bash(./.venv/Scripts/python.exe -m pip install -q ruff)",
+      "Bash(./.venv/Scripts/python.exe -m ruff check app scripts tests)",
+      "Bash(MAAHAF_LLM__PROVIDER=mock MAAHAF_OTEL_ENABLED=false ./.venv/Scripts/python.exe -c ' *)",
+      "Bash(MAAHAF_LLM__PROVIDER=mock MAAHAF_OTEL_ENABLED=false MAAHAF_LOG_LEVEL=ERROR ./.venv/Scripts/python.exe -c ' *)",
+      "Bash(npm install *)",
+      "Bash(ls \"C:/Users/acer/.claude/projects/c--Users-acer-OneDrive-Desktop-RAG/memory/\" 2>&1; echo \"---\"; cat \"C:/Users/acer/.claude/projects/c--Users-acer-OneDrive-Desktop-RAG/memory/MEMORY.md\" 2>&1)",
+      "Read(//c/Users/acer/.claude/projects/c--Users-acer-OneDrive-Desktop-RAG/memory/**)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(node node_modules/typescript/bin/tsc -b)",
+      "Bash(git rm *)",
+      "Bash(git add *)"
+    ]
+  }
+}

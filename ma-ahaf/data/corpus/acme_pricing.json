@@ -1,0 +1,7 @@
+{
+  "title": "ACME Cloud — Pricing (2026)",
+  "source": "product-doc",
+  "authority": 0.9,
+  "published_at": "2026-01-02",
+  "text": "As of January 2026, ACME Cloud has three plans. Free: 1 project, 1 GB storage, community support, no SLA. Standard: 29 US dollars per seat per month, includes 100 GB storage, email support with a 1 business-day response target, and the 99.9% SLA. Enterprise: custom pricing, includes SSO/SAML, dedicated database option, 24/7 support with a 1-hour response target for critical issues, and the 99.95% SLA. Storage beyond the plan allowance is billed at 0.10 US dollars per GB per month. Outbound data transfer is 0.08 US dollars per GB after the first 200 GB each month. Annual billing receives a 15% discount versus monthly billing."
+}

@@ -1,0 +1,7 @@
+{
+  "title": "ACME Cloud — Support Process and Escalation",
+  "source": "support-runbook",
+  "authority": 0.85,
+  "published_at": "2025-12-10",
+  "text": "Support tickets are triaged into four severities. Sev-1 (production down, no workaround): Enterprise 1-hour response, Standard best effort. Sev-2 (major feature impaired): 4 business hours for Enterprise, 1 business day for Standard. Sev-3 (minor issue) and Sev-4 (question): 1 to 2 business days. A ticket is escalated to engineering when it remains unresolved past two response cycles, when it affects more than one customer, or when the support agent and the customer disagree on the severity. Billing disputes are routed to the finance queue and are not handled by technical support. Customers can request a callback for Sev-1 and Sev-2 issues. Refund approvals above 500 US dollars require a manager sign-off."
+}

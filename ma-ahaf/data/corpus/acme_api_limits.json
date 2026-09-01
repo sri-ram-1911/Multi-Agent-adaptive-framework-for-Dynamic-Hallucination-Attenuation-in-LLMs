@@ -1,0 +1,7 @@
+{
+  "title": "ACME Cloud — API Rate Limits",
+  "source": "product-doc",
+  "authority": 0.9,
+  "published_at": "2025-12-01",
+  "text": "The ACME Cloud REST API enforces per-token rate limits. Free tier: 60 requests per minute. Standard tier: 600 requests per minute and 50000 requests per day. Enterprise tier: 6000 requests per minute by default, adjustable on request. When a limit is exceeded the API returns HTTP 429 with a Retry-After header indicating the number of seconds to wait. Burst allowance is roughly twice the steady-state limit for up to 10 seconds. List endpoints are paginated with a maximum page size of 200. Write endpoints additionally enforce a concurrency limit of 20 in-flight requests per token. Rate-limit counters reset on a rolling window, not on a fixed clock boundary."
+}
