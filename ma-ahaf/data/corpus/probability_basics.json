@@ -1,0 +1,6 @@
+{
+  "title": "Probability Basics",
+  "source": "mathematics",
+  "authority": 0.76,
+  "text": "Probability is the branch of mathematics that quantifies the likelihood of events occurring, expressed as a number between 0 (impossible) and 1 (certain). Basic concepts include independent events (the outcome of one does not affect another, like coin flips), conditional probability (the likelihood of an event given that another has occurred), and expected value. Probability theory underlies statistics, risk assessment, and machine learning."
+}

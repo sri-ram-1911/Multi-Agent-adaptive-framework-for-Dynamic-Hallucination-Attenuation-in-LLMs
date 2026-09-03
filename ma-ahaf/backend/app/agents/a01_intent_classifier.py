@@ -17,6 +17,16 @@ from app.orchestration.state import RequestState
 LABELS = ["factual", "analytical", "creative", "mixed", "high_stakes"]
 _HEDGES = ("maybe", "not sure", "somehow", "something", "etc", "or so", "kind of")
 
+# high-consequence cues: a hit here forces the high_stakes route regardless of
+# what the (small) zero-shot model says — medical / legal / financial / safety.
+_HIGH_STAKES_CUES = (
+    "dose", "dosage", "mg/kg", "ibuprofen", "acetaminophen", "paracetamol",
+    "medication", "prescri", "diagnos", "symptom", "overdose", "allerg",
+    "lawsuit", "legal advice", "contract clause", "liable", "liability",
+    "invest", "portfolio", "tax owed", "which stock", "safe daily", "safe dose",
+    "toxic", "poison", "self-harm", "seizure", "blood pressure",
+)
+
 
 def _finetuned_predict(text: str) -> dict[str, float] | None:
     path = os.path.join(settings.artifacts_dir, "intent")
@@ -40,6 +50,13 @@ class IntentClassifier(Agent):
         ft = _finetuned_predict(text)
         scores = ft or classify(text, LABELS)
         task_type = max(scores, key=scores.get)
+
+        # safety override: never let a borderline classifier downgrade a
+        # high-consequence request out of the deep-verification / low-budget path.
+        low = text.lower()
+        if task_type != "high_stakes" and any(cue in low for cue in _HIGH_STAKES_CUES):
+            scores = {**scores, "high_stakes": max(scores.values(), default=0.5) + 0.05}
+            task_type = "high_stakes"
 
         words = text.split()
         ambiguity = min(

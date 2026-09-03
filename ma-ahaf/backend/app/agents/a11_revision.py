@@ -17,8 +17,23 @@ _SYS = (
     "'evidence suggests', or explicit uncertainty).\n"
     "- Keep well-supported claims and their [S#] markers intact.\n"
     "- Do NOT alter text inside <keep>...</keep> — it is intentionally creative.\n"
-    "- Preserve the original structure and usefulness. Return only the revised answer."
+    "- Preserve the original structure and usefulness.\n"
+    "- Output ONLY the revised answer text for the end user. Do NOT include the "
+    "problem-claim list, headings like 'PROBLEM CLAIMS' or 'SUPPORTED CLAIMS', or "
+    "any notes about what you changed."
 )
+
+# headings from the reviser's own instructions that sometimes get echoed back
+_SCAFFOLD_MARKERS = ("PROBLEM CLAIMS", "SUPPORTED CLAIMS", "PROBLEM CLAIM:", "CHANGES MADE")
+
+
+def _strip_scaffold(text: str) -> str:
+    cut = len(text)
+    for m in _SCAFFOLD_MARKERS:
+        i = text.find(m)
+        if i > 40:  # keep it only if it's clearly trailing, not the whole answer
+            cut = min(cut, i)
+    return text[:cut].strip()
 
 
 class Revision(Agent):
@@ -57,7 +72,19 @@ class Revision(Agent):
             ],
             temperature=0.1, max_tokens=800,
         )
-        revised = resp.text.replace("<keep>", "").replace("</keep>", "").strip()
+        revised = _strip_scaffold(
+            resp.text.replace("<keep>", "").replace("</keep>", "").strip()
+        )
+        # if the reviser collapsed the answer to almost nothing, keep the draft —
+        # but still count the attempt so the loop is bounded and cannot spin.
+        if len(revised) < 25 or len(revised) < 0.35 * len(draft):
+            state.revision_loops += 1
+            return (
+                {"revised": False, "problem_claims": len(problems), "reason": "revision rejected",
+                 "revision_loop": state.revision_loops},
+                f"revision discarded (degenerate output), kept draft; {len(problems)} problem claim(s)",
+                state.gateway.model_for("reviser"),
+            )
 
         state.chosen_candidate = revised
         state.revised = True

@@ -115,7 +115,7 @@ dependency edges (`app/claimgraph/graph.py`).
 |---|---|---|---|
 | Embeddings | DL | `BAAI/bge-small-en-v1.5` | hashed bag-of-tokens (384-d) |
 | Reranker | DL | `cross-encoder/ms-marco-MiniLM-L-6-v2` | lexical overlap |
-| Verification / contradiction | DL | `MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli` NLI | overlap + negation heuristic |
+| Verification / contradiction | DL / LLM | `MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli` NLI, or the gateway verifier model as a batched entailment judge (`MAAHAF_NLI_BACKEND=auto` picks the LLM path for openai/local providers) | overlap + negation heuristic |
 | Intent classifier | DL | zero-shot `facebook/bart-large-mnli`; opt. fine-tuned DistilBERT | keyword scoring |
 | Claim-type classifier | ML | TF-IDF + LogisticRegression | LLM-provided type |
 | Hallucination risk `H(x)` | ML | isotonic-calibrated LogisticRegression | proposal's fixed weights |

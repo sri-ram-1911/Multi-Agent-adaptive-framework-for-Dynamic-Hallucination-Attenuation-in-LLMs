@@ -23,7 +23,15 @@ def budget_for(task_type: str, *, criticality: float) -> float:
 
 
 def consumed(cg: ClaimGraph) -> float:
-    return sum(c.risk_score * c.criticality for c in cg.claims)
+    """Budget is spent only by checkable claims that verification did *not*
+    confirm — a fully-supported answer consumes ~0 regardless of how many
+    claims it makes, so answer length never by itself trips the budget."""
+    return sum(
+        c.risk_score * c.criticality
+        for c in cg.claims
+        if c.claim_type not in ("creative", "opinion")
+        and c.verdict != "supported"
+    )
 
 
 def over_budget(cg: ClaimGraph, task_type: str, criticality: float) -> tuple[bool, float, float]:

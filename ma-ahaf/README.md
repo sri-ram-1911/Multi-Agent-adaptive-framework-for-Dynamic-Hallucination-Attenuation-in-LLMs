@@ -112,11 +112,25 @@ make eval    # runs MA-AHAF vs static-RAG baseline over data/benchmark/benchmark
 Produces `artifacts/eval/<run>/report.json` and `pareto.csv` (viewable in the
 dashboard **Evaluation** page).
 
+## Evaluation & retraining (no Docker needed)
+
+```bash
+cd backend
+python -m scripts.eval_local --limit 40          # MA-AHAF vs static-RAG, local corpus
+python -m app.ml.retrain_from_eval               # retrain risk_model + calibrator on the labels
+python -m scripts.finalize_report                # fill docs/final-report.md §4
+```
+
+Set `MAAHAF_LLM__PROVIDER=openai` (with credits) for the GPT-4o-mini numbers.
+
 ## Documentation
 
-- [`docs/SRS.md`](docs/SRS.md) — software requirements specification
+- [`docs/SRS.md`](docs/SRS.md) — software requirements specification (FR-1…FR-22)
 - [`docs/architecture.md`](docs/architecture.md) — layers, flow, ML/DL details
 - [`docs/evaluation-methodology.md`](docs/evaluation-methodology.md) — benchmark & metrics
+- [`docs/final-report.md`](docs/final-report.md) — methodology, results, limitations (proposal §13)
+- [`SECURITY.md`](SECURITY.md) — controls + go-live checklist
+- [`deploy/k8s/`](deploy/k8s/) — production Kubernetes manifests · [`deploy/loadtest/`](deploy/loadtest/) — k6 load test
 
 ## License
 

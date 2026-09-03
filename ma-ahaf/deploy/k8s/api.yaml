@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maahaf-api
+  namespace: ma-ahaf
+spec:
+  replicas: 3
+  selector: { matchLabels: { app: maahaf-api } }
+  strategy:
+    rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }
+  template:
+    metadata:
+      labels: { app: maahaf-api }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001
+      initContainers:
+        - name: migrate
+          image: ghcr.io/your-org/ma-ahaf-api:latest
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - configMapRef: { name: ma-ahaf-config }
+            - secretRef: { name: ma-ahaf-secrets }
+      containers:
+        - name: api
+          image: ghcr.io/your-org/ma-ahaf-api:latest
+          args: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+          ports: [{ containerPort: 8000 }]
+          envFrom:
+            - configMapRef: { name: ma-ahaf-config }
+            - secretRef: { name: ma-ahaf-secrets }
+          resources:
+            requests: { cpu: "1", memory: "2Gi" }
+            limits: { cpu: "2", memory: "4Gi" }
+          readinessProbe:
+            httpGet: { path: /ready, port: 8000 }
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: models, mountPath: /models }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: models
+          persistentVolumeClaim: { claimName: maahaf-models }
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: maahaf-models, namespace: ma-ahaf }
+spec:
+  accessModes: ["ReadWriteMany"]
+  resources: { requests: { storage: 10Gi } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: maahaf-api, namespace: ma-ahaf }
+spec:
+  selector: { app: maahaf-api }
+  ports: [{ port: 80, targetPort: 8000 }]
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: maahaf-api, namespace: ma-ahaf }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: maahaf-api }
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: maahaf-api, namespace: ma-ahaf }
+spec:
+  minAvailable: 2
+  selector: { matchLabels: { app: maahaf-api } }

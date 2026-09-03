@@ -2,7 +2,7 @@
 COMPOSE := docker compose
 API := $(COMPOSE) exec -T api
 
-.PHONY: help up up-obs down logs build migrate seed bootstrap-models train-models test lint fmt eval shell frontend-dev
+.PHONY: help up up-obs down logs build migrate seed bootstrap-models train-models test lint fmt eval eval-local eval-openai capture dashboard-openai retrain finalize-report demo demo-real shell frontend-dev
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -59,8 +59,26 @@ lint: ## Ruff + mypy
 fmt: ## Ruff format
 	$(API) ruff format app scripts tests
 
-eval: ## Run evaluation harness (MA-AHAF vs baseline)
+eval: ## Run evaluation harness in the Docker stack (MA-AHAF vs baseline)
 	$(API) python -m scripts.run_eval --dataset data/benchmark/benchmark.jsonl
+
+eval-local: ## Run evaluation with NO Postgres (local corpus + configured provider)
+	cd backend && python -m scripts.eval_local --limit 40
+
+eval-openai: ## Full 77-item eval on gpt-4o-mini (needs OPENAI_API_KEY in backend/.env)
+	cd backend && MAAHAF_LLM__PROVIDER=openai python -m scripts.eval_local --limit 77 --timeout 180
+
+capture: ## Write 5 real gpt-4o-mini traces to demo_traces.json
+	cd backend && MAAHAF_LLM__PROVIDER=openai MAAHAF_MAX_REVISION_LOOPS=1 python -m scripts.capture_traces
+
+dashboard-openai: ## Serve the dashboard running the pipeline on gpt-4o-mini
+	cd backend && MAAHAF_LLM__PROVIDER=openai python -m scripts.serve_demo
+
+retrain: ## Retrain risk_model + calibrator from the latest eval run's labels
+	cd backend && python -m app.ml.retrain_from_eval
+
+finalize-report: ## Fill docs/final-report.md section 4 from the latest eval + retrain
+	cd backend && python -m scripts.finalize_report
 
 shell: ## Shell into api container
 	$(COMPOSE) exec api bash

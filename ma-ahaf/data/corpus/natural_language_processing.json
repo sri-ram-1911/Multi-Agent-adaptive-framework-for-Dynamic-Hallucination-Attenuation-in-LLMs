@@ -1,0 +1,6 @@
+{
+  "title": "Natural Language Processing",
+  "source": "technology-ai",
+  "authority": 0.76,
+  "text": "Natural language processing (NLP) is the field of AI concerned with enabling computers to understand, interpret, and generate human language. Key tasks include machine translation, sentiment analysis, text summarization, and question answering. Modern NLP relies heavily on transformer-based neural network architectures, which underlie large language models capable of generating coherent, contextually relevant text."
+}

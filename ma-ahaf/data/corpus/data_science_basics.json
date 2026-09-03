@@ -1,0 +1,6 @@
+{
+  "title": "Data Science Basics",
+  "source": "technology-ai",
+  "authority": 0.74,
+  "text": "Data science is an interdisciplinary field that uses statistical methods, programming, and domain expertise to extract insights and knowledge from data. The typical workflow includes data collection, cleaning (handling missing or inconsistent data), exploratory analysis, modeling (often using machine learning), and communicating findings through visualization. Data scientists commonly use tools such as Python, R, and SQL."
+}

@@ -1,0 +1,6 @@
+{
+  "title": "IP Addresses and DNS",
+  "source": "technology",
+  "authority": 0.76,
+  "text": "An IP (Internet Protocol) address is a unique numerical identifier assigned to each device on a network, enabling it to send and receive data. IPv4 addresses (e.g., 192.168.1.1) use a 32-bit format with about 4.3 billion possible addresses, while the newer IPv6 offers a vastly larger address space. The Domain Name System (DNS) acts like a phonebook, translating memorable domain names into IP addresses."
+}

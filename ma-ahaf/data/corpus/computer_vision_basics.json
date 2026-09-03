@@ -1,0 +1,6 @@
+{
+  "title": "Computer Vision Basics",
+  "source": "technology-ai",
+  "authority": 0.76,
+  "text": "Computer vision is the field of AI focused on enabling computers to interpret and understand visual information from images and video. Common tasks include image classification (identifying what an image contains), object detection (locating objects within an image), and facial recognition. Applications include self-driving cars, medical image analysis, and quality inspection in manufacturing."
+}

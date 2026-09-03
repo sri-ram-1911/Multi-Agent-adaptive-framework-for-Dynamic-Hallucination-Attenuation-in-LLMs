@@ -58,6 +58,13 @@ export const api = {
   startEval: (limit = 20) =>
     req<any>(`/v1/eval/run?limit=${limit}`, { method: "POST" }),
 
+  reviewQueue: (status = "pending") =>
+    req<any[]>(`/v1/review/queue?status=${status}`),
+  reviewStats: () => req<{ pending: number; reviewed: number }>("/v1/review/queue/stats"),
+  reviewItem: (id: string) => req<any>(`/v1/review/queue/${id}`),
+  resolveReview: (id: string, body: { decision: string; note?: string; revised_response?: string }) =>
+    req<any>(`/v1/review/queue/${id}/resolve`, { method: "POST", body: JSON.stringify(body) }),
+
   graph: () => req<{ mermaid: string }>("/v1/graph"),
 };
 

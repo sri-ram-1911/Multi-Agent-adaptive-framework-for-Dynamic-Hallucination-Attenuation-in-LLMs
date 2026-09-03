@@ -181,3 +181,8 @@ class EscalationQueue(Base):
     reason: Mapped[str] = mapped_column(String)
     status: Mapped[str] = mapped_column(String, default="pending")  # pending/reviewed
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    # human review outcome
+    decision: Mapped[str | None] = mapped_column(String, nullable=True)  # approved/revised/rejected
+    review_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    reviewed_by: Mapped[str | None] = mapped_column(String, nullable=True)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

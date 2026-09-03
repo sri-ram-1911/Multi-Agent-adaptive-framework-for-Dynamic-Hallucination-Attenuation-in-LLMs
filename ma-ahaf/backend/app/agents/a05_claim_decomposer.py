@@ -25,14 +25,29 @@ _TEMPORAL_RE = re.compile(r"\b(19|20)\d{2}\b|\b(today|now|currently|as of|latest
 _CREATIVE_MARKERS = ("imagine", "story", "poem", "metaphor", "fictional", "let's pretend")
 
 
+_VALID_TYPES = {"factual", "numeric", "causal", "temporal", "opinion", "creative"}
+# labels an LLM commonly returns that aren't in our enum -> nearest valid type
+_TYPE_ALIASES = {
+    "assumption": "opinion", "speculation": "opinion", "belief": "opinion",
+    "prediction": "causal", "hypothesis": "causal", "conclusion": "causal",
+    "recommendation": "opinion", "proposal": "creative", "statistic": "numeric",
+    "quantitative": "numeric", "date": "temporal", "fact": "factual",
+}
+
+
 def _classify_type(text: str, llm_type: str) -> str:
     model = registry.load("claim_type.joblib")
     if model is not None:
         try:
-            return str(model.predict([text])[0])
+            pred = str(model.predict([text])[0]).lower()
+            if pred in _VALID_TYPES:
+                return pred
         except Exception:  # pragma: no cover
             pass
-    return llm_type or "factual"
+    t = (llm_type or "").strip().lower()
+    if t in _VALID_TYPES:
+        return t
+    return _TYPE_ALIASES.get(t, "factual")
 
 
 class ClaimDecomposer(Agent):
@@ -47,16 +62,19 @@ class ClaimDecomposer(Agent):
             temperature=0.0,
             max_tokens=800,
         )
-        raw_claims = data.get("claims", [])
-        if not raw_claims:  # fallback: sentence split
-            raw_claims = [
+        def _sentence_claims() -> list[dict]:
+            return [
                 {"text": s.strip()}
                 for s in re.split(r"(?<=[.!?])\s+", draft)
                 if len(s.strip()) > 15
             ]
 
+        raw_claims = data.get("claims", []) or _sentence_claims()
+
         claims: list[Claim] = []
         for i, rc in enumerate(raw_claims[:12]):
+            if not isinstance(rc, dict):
+                rc = {"text": str(rc)}
             text = str(rc.get("text", "")).strip()
             if not text:
                 continue
@@ -64,28 +82,43 @@ class ClaimDecomposer(Agent):
             lower = text.lower()
             if any(m in lower for m in _CREATIVE_MARKERS):
                 ctype = "creative"
-            # on an explicitly creative request, only keep a claim as factual when
-            # the LLM itself flagged it as such — the rest is creative latitude.
-            if state.task_type == "creative" and str(rc.get("type", "")) not in ("factual", "numeric"):
+            # on an explicitly creative request everything is creative latitude —
+            # a poem/story line is not a checkable proposition — UNLESS it states
+            # a hard, verifiable specific (a number, year, or measurement), which
+            # we still fact-check even inside creative output.
+            if state.task_type == "creative" and not re.search(r"\d", text):
                 ctype = "creative"
             temporal = 0.8 if _TEMPORAL_RE.search(text) else (0.3 if ctype == "temporal" else 0.0)
-            crit = float(rc.get("criticality", 0.6 if ctype in ("factual", "numeric", "causal") else 0.3))
+            try:
+                crit = float(rc.get("criticality", 0.6 if ctype in ("factual", "numeric", "causal") else 0.3))
+            except (TypeError, ValueError):
+                crit = 0.5
             span = None
             idx = draft.find(text[:40])
             if idx >= 0:
                 span = (idx, idx + len(text))
-            claims.append(
-                Claim(
-                    id=str(uuid.uuid4()),
-                    ordinal=i,
-                    text=text,
-                    claim_type=ctype,  # type: ignore[arg-type]
-                    criticality=round(min(1.0, crit), 3),
-                    temporal_sensitivity=temporal,
-                    entities=[e for e in rc.get("entities", []) if isinstance(e, str)][:6],
-                    span=span,
+            try:
+                claims.append(
+                    Claim(
+                        id=str(uuid.uuid4()),
+                        ordinal=i,
+                        text=text,
+                        claim_type=ctype,  # type: ignore[arg-type]
+                        criticality=round(min(1.0, max(0.0, crit)), 3),
+                        temporal_sensitivity=temporal,
+                        entities=[e for e in rc.get("entities", []) if isinstance(e, str)][:6],
+                        span=span,
+                    )
                 )
-            )
+            except Exception:  # never let a single malformed claim abort decomposition
+                claims.append(Claim(id=str(uuid.uuid4()), ordinal=i, text=text,
+                                    claim_type="factual", criticality=0.5))
+
+        # last-resort: LLM returned claims but none survived -> split the draft
+        if not claims and len(draft.split()) >= 4 and state.task_type != "creative":
+            for i, s in enumerate(_sentence_claims()[:12]):
+                claims.append(Claim(id=str(uuid.uuid4()), ordinal=i, text=s["text"],
+                                    claim_type="factual", criticality=0.5))
 
         # naive dependency edges: a claim depends on earlier claims sharing an entity
         deps: dict[str, list[str]] = {}

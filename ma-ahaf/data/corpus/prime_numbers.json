@@ -1,0 +1,6 @@
+{
+  "title": "Prime Numbers",
+  "source": "mathematics",
+  "authority": 0.78,
+  "text": "A prime number is a natural number greater than 1 that has no positive divisors other than 1 and itself (e.g., 2, 3, 5, 7, 11, 13). Every other natural number greater than 1 can be expressed as a product of prime numbers (its prime factorization), a concept known as the fundamental theorem of arithmetic. Prime numbers play a central role in number theory and modern cryptography."
+}

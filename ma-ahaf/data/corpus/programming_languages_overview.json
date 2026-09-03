@@ -1,0 +1,6 @@
+{
+  "title": "Programming Languages Overview",
+  "source": "technology",
+  "authority": 0.76,
+  "text": "A programming language is a formal set of instructions used to communicate commands to a computer. Languages vary by paradigm (procedural, object-oriented, functional) and use case: Python is popular for data science and scripting due to its readability; JavaScript runs in web browsers for interactivity; C and C++ offer low-level control for performance-critical systems; SQL is used for querying databases."
+}

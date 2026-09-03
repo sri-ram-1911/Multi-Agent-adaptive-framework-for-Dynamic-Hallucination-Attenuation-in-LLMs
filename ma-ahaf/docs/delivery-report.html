@@ -1,0 +1,867 @@
+<title>MA-AHAF Delivery Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper:#f6f7f9; --card:#ffffff; --card-2:#eef1f5; --sunk:#f0f2f6;
+    --ink:#1b2330; --ink-soft:#43505f; --muted:#697585; --faint:#96a0ad;
+    --rule:#e2e6ec; --rule-strong:#cdd4de;
+    --accent:#4f46e5; --accent-ink:#3730a3; --accent-wash:#eeeffe;
+    --teal:#0e7490; --teal-wash:#e2f2f5;
+    --ok:#15803d; --ok-wash:#e6f4ea;
+    --warn:#b45309; --warn-wash:#fbf0df;
+    --bad:#b91c1c; --bad-wash:#fbe9e9;
+    --shadow:0 1px 2px rgba(20,25,35,.04), 0 10px 30px -16px rgba(20,25,35,.15);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#0d1016; --card:#151a22; --card-2:#1b212b; --sunk:#11151c;
+      --ink:#e7ecf3; --ink-soft:#bac3d0; --muted:#8b95a3; --faint:#606a78;
+      --rule:#262d38; --rule-strong:#343d4a;
+      --accent:#9a92fb; --accent-ink:#b7b1fc; --accent-wash:#1d1f34;
+      --teal:#43b3cc; --teal-wash:#122a30;
+      --ok:#54c17f; --ok-wash:#11291c;
+      --warn:#dc9a4b; --warn-wash:#2c2113;
+      --bad:#e8807f; --bad-wash:#2e1719;
+      --shadow:0 1px 2px rgba(0,0,0,.35), 0 14px 36px -18px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#0d1016; --card:#151a22; --card-2:#1b212b; --sunk:#11151c;
+    --ink:#e7ecf3; --ink-soft:#bac3d0; --muted:#8b95a3; --faint:#606a78;
+    --rule:#262d38; --rule-strong:#343d4a;
+    --accent:#9a92fb; --accent-ink:#b7b1fc; --accent-wash:#1d1f34;
+    --teal:#43b3cc; --teal-wash:#122a30;
+    --ok:#54c17f; --ok-wash:#11291c;
+    --warn:#dc9a4b; --warn-wash:#2c2113;
+    --bad:#e8807f; --bad-wash:#2e1719;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 14px 36px -18px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.62; -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  .shell { max-width: 1120px; margin: 0 auto; padding: 0 28px;
+           display: grid; grid-template-columns: 1fr; gap: 0; }
+  @media (min-width: 1080px) {
+    .shell { grid-template-columns: 216px minmax(0, 792px); gap: 48px; justify-content: center; }
+  }
+
+  /* ---- table of contents ---- */
+  nav.toc { display: none; }
+  @media (min-width: 1080px) {
+    nav.toc {
+      display: block; position: sticky; top: 0; align-self: start;
+      max-height: 100vh; overflow-y: auto; padding: 40px 0 40px;
+      font-size: 12.5px;
+    }
+    nav.toc .lbl {
+      font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--faint); margin-bottom: 10px;
+    }
+    nav.toc a {
+      display: block; padding: 3.5px 0 3.5px 12px; color: var(--muted);
+      text-decoration: none; border-left: 2px solid var(--rule); line-height: 1.35;
+    }
+    nav.toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+    nav.toc a b { color: var(--faint); font-weight: 500; margin-right: 6px; font-family: "IBM Plex Mono", monospace; }
+  }
+
+  main.doc { padding: 40px 0 96px; min-width: 0; }
+
+  /* ---- cover ---- */
+  .cover { padding-bottom: 30px; border-bottom: 2px solid var(--ink); margin-bottom: 34px; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-weight: 700; font-size: clamp(1.9rem, 4.4vw, 2.7rem); line-height: 1.12;
+    letter-spacing: -.015em; margin: 0 0 12px; text-wrap: balance; color: var(--ink);
+  }
+  .subtitle { font-size: 1.05rem; color: var(--ink-soft); max-width: 60ch; margin: 0 0 24px; }
+  .meta {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden;
+  }
+  .meta div { background: var(--card); padding: 11px 14px; }
+  .meta dt {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: 3px;
+  }
+  .meta dd { margin: 0; font-size: 13px; font-weight: 500; color: var(--ink); }
+  .meta dd.ok { color: var(--ok); }
+
+  .printhint {
+    margin: 20px 0 0; padding: 10px 14px; border-radius: 9px;
+    background: var(--accent-wash); border: 1px solid var(--rule);
+    font-size: 12.5px; color: var(--ink-soft);
+  }
+  .printhint b { color: var(--ink); }
+  .printhint kbd {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; background: var(--card);
+    border: 1px solid var(--rule-strong); border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px;
+  }
+
+  /* ---- headings ---- */
+  h2 {
+    font-family: "Source Serif 4", Georgia, serif; font-weight: 700;
+    font-size: 1.5rem; letter-spacing: -.01em; line-height: 1.2;
+    margin: 56px 0 4px; padding-top: 20px; border-top: 1px solid var(--rule);
+    scroll-margin-top: 16px; color: var(--ink);
+  }
+  h2 .num {
+    font-family: "IBM Plex Mono", monospace; font-size: .95rem; font-weight: 500;
+    color: var(--accent); margin-right: 12px;
+  }
+  h2:first-of-type { margin-top: 8px; }
+  h3 {
+    font-family: "Source Serif 4", Georgia, serif; font-weight: 600; font-size: 1.13rem;
+    margin: 30px 0 8px; color: var(--ink); scroll-margin-top: 16px;
+  }
+  p { margin: 12px 0; }
+  a { color: var(--accent); }
+  strong { font-weight: 600; color: var(--ink); }
+  ul, ol { margin: 12px 0; padding-left: 22px; }
+  li { margin: 5px 0; }
+  li::marker { color: var(--faint); }
+
+  code:not(pre code) {
+    font-family: "IBM Plex Mono", monospace; font-size: .84em;
+    background: var(--sunk); border: 1px solid var(--rule); border-radius: 4px;
+    padding: 1px 5px; color: var(--ink-soft); word-break: break-word;
+  }
+
+  .lede {
+    font-size: 1.02rem; color: var(--ink-soft); border-left: 3px solid var(--accent);
+    padding: 2px 0 2px 16px; margin: 16px 0;
+  }
+
+  /* ---- callouts ---- */
+  .note {
+    margin: 18px 0; padding: 13px 16px; border-radius: 10px; font-size: 13.5px;
+    background: var(--card-2); border: 1px solid var(--rule); color: var(--ink-soft);
+  }
+  .note.win  { background: var(--ok-wash);  border-color: transparent; }
+  .note.warn { background: var(--warn-wash); border-color: transparent; }
+  .note b { color: var(--ink); }
+
+  /* ---- tables ---- */
+  .tw { overflow-x: auto; margin: 18px 0; border: 1px solid var(--rule); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  thead th {
+    background: var(--card-2); text-align: left; font-weight: 600; color: var(--ink);
+    padding: 9px 13px; border-bottom: 1px solid var(--rule-strong); white-space: nowrap;
+    font-size: 11.5px; letter-spacing: .02em; text-transform: uppercase;
+  }
+  tbody td { padding: 9px 13px; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--card-2); }
+  td .mono, th .mono { font-size: 12px; color: var(--ink); }
+  .tnum { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .delta-up   { color: var(--ok); font-weight: 600; }
+  .delta-down { color: var(--bad); font-weight: 600; }
+  .delta-flat { color: var(--muted); }
+
+  .pill {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 10.5px;
+    font-weight: 500; padding: 2px 7px; border-radius: 5px; letter-spacing: .02em; white-space: nowrap;
+  }
+  .p-done { background: var(--ok-wash);   color: var(--ok); }
+  .p-part { background: var(--warn-wash); color: var(--warn); }
+  .p-future { background: var(--card-2);  color: var(--muted); }
+
+  /* ---- diagram ---- */
+  .mermaid {
+    background: var(--card); border: 1px solid var(--rule); border-radius: 12px;
+    padding: 20px; margin: 20px 0; overflow-x: auto; text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  /* ---- metric cards ---- */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+  .kpi { background: var(--card); border: 1px solid var(--rule); border-radius: 11px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .kpi .k-lbl { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+  .kpi .k-val { font-size: 1.5rem; font-weight: 600; margin: 5px 0 2px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .kpi .k-val .arrow { font-size: .95rem; color: var(--muted); font-weight: 500; }
+  .kpi .k-sub { font-size: 11.5px; color: var(--muted); }
+  .kpi.good .k-val { color: var(--ok); }
+  .kpi.cost .k-val { color: var(--warn); }
+
+  hr.soft { border: none; border-top: 1px solid var(--rule); margin: 28px 0; }
+
+  pre.cmd {
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; line-height: 1.75;
+    background: var(--sunk); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 14px 16px; margin: 16px 0; overflow-x: auto; color: var(--ink);
+    white-space: pre;
+  }
+  pre.cmd .c { color: var(--muted); }
+
+  footer {
+    margin-top: 60px; padding-top: 20px; border-top: 2px solid var(--ink);
+    font-size: 12px; color: var(--faint); font-family: "IBM Plex Mono", monospace;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  /* ---- print / save-as-pdf ---- */
+  @media print {
+    :root { --paper:#fff; --card:#fff; --card-2:#f3f3f3; --sunk:#f3f3f3;
+            --ink:#000; --ink-soft:#222; --muted:#444; --rule:#bbb; --rule-strong:#999;
+            --shadow:none; }
+    body { font-size: 10.5pt; }
+    .shell { display: block; max-width: none; padding: 0; }
+    nav.toc, .printhint { display: none !important; }
+    main.doc { padding: 0; }
+    h2 { margin-top: 26px; break-after: avoid; }
+    h3 { break-after: avoid; }
+    table, .mermaid, .kpi, .note { break-inside: avoid; }
+    tr { break-inside: avoid; }
+    a { color: #000; text-decoration: none; }
+    .kpis { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>
+
+<div class="shell">
+  <nav class="toc">
+    <div class="lbl">Contents</div>
+    <a href="#summary"><b>1</b>Executive summary</a>
+    <a href="#deliverables"><b>2</b>Deliverables</a>
+    <a href="#architecture"><b>3</b>Architecture &amp; workflow</a>
+    <a href="#lifecycle"><b>4</b>Request lifecycle</a>
+    <a href="#agents"><b>5</b>The 13 agents</a>
+    <a href="#controller"><b>6</b>ARCOP &amp; risk model</a>
+    <a href="#stack"><b>7</b>Technology stack</a>
+    <a href="#ml"><b>8</b>ML / DL components</a>
+    <a href="#filemap"><b>9</b>Repository map</a>
+    <a href="#api"><b>10</b>API surface</a>
+    <a href="#eval"><b>11</b>Evaluation &amp; results</a>
+    <a href="#security"><b>12</b>Security &amp; governance</a>
+    <a href="#run"><b>13</b>How to run it</a>
+    <a href="#limits"><b>14</b>Limitations &amp; next steps</a>
+  </nav>
+
+  <main class="doc">
+    <header class="cover">
+      <div class="eyebrow">Applied AI · LLM Reliability · Delivery Report</div>
+      <h1>MA-AHAF — Multi-Agent Adaptive Hallucination Attenuation Framework</h1>
+      <p class="subtitle">
+        A model-agnostic adaptive layer between an application and its LLMs that decides, per request,
+        how factual, how grounded, how verified, and how creative the answer should be — with a full audit trail.
+        This report documents what was built against <span class="mono">project proposal final.pdf</span>,
+        the technology, the request workflow, a file-by-file map of the codebase, and the measured evaluation.
+      </p>
+      <dl class="meta">
+        <div><dt>Project type</dt><dd>Applied AI / Multi-Agent Systems</dd></div>
+        <div><dt>Proposal</dt><dd>v1.0 · 18 Aug 2026</dd></div>
+        <div><dt>Report date</dt><dd>1 Sep 2026</dd></div>
+        <div><dt>Build status</dt><dd class="ok">Prototype complete</dd></div>
+        <div><dt>Agents implemented</dt><dd>13 / 13 (proposal §7)</dd></div>
+        <div><dt>Tests</dt><dd>30 passing · lint clean</dd></div>
+        <div><dt>LLM provider</dt><dd>OpenAI · gpt-4o-mini</dd></div>
+        <div><dt>Knowledge base</dt><dd>143 docs · 13 domains</dd></div>
+      </dl>
+      <p class="printhint">
+        <b>Download / PDF:</b> press <kbd>Ctrl</kbd>+<kbd>P</kbd> (or <kbd>&#8984;</kbd>+<kbd>P</kbd>) and choose
+        <b>Save as PDF</b>. The layout is print-tuned — the sidebar and this note are dropped automatically.
+      </p>
+    </header>
+
+    <h2 id="summary"><span class="num">1</span>Executive summary</h2>
+    <p>
+      Conventional hallucination mitigation trades one goal for another: heavy grounding kills useful
+      creativity; free generation invents facts. <strong>MA-AHAF treats reliability and creativity as a
+      per-request operating point</strong>, not a fixed mode. For every request a closed-loop controller
+      estimates hallucination risk, evidence coverage, source agreement, claim criticality, ambiguity and
+      creativity demand, and from those picks a six-parameter policy that governs how much grounding,
+      verification, citation, uncertainty disclosure, revision and abstention are applied.
+    </p>
+    <p>What was delivered in this engagement:</p>
+    <ul>
+      <li><strong>All 13 agents</strong> from proposal §7, an <strong>ARCOP</strong> adaptive controller (§8),
+        the claim-level <strong>H(x)</strong> risk model (§9), a <strong>Claim Risk Graph</strong>, evidence
+        triangulation (§11) and a model-agnostic <strong>LLM gateway</strong> (§12).</li>
+      <li>A <strong>FastAPI</strong> service (API-key + JWT + RBAC, tenant isolation, PII redaction,
+        OpenTelemetry + Prometheus, OpenAPI docs) and a <strong>React dashboard</strong> with a live
+        Playground, trace explorer, human-review queue, metrics and evaluation views.</li>
+      <li>A <strong>143-document knowledge base</strong> across 13 domains, a <strong>77-item labelled
+        benchmark</strong>, an automated <strong>evaluation harness</strong> (MA-AHAF vs static-RAG baseline),
+        and a <strong>retraining loop</strong> that refits the risk model and calibrator from real eval labels.</li>
+      <li>Deployment artifacts: <span class="mono">docker compose</span> stack, Kubernetes manifests,
+        a k6 load-test, a security review, and five documentation files.</li>
+    </ul>
+    <div class="note win">
+      <b>Headline evaluation result (77 items, gpt-4o-mini).</b> Confidence calibration error
+      <b>ECE 0.191&nbsp;&rarr;&nbsp;0.066</b> (&minus;65%), and MA-AHAF <b>abstains on 15.8%</b> of items — every
+      one on the deliberately un-answerable high-stakes set, where the static-RAG baseline always answers.
+      The framework's core §5/§10 objectives — calibrated confidence and safe abstention — hold. The price
+      is latency and cost (~9&ndash;14&times;), which the policy spends only where risk warrants.
+    </div>
+
+    <h2 id="deliverables"><span class="num">2</span>Deliverables</h2>
+    <p>Mapped to proposal §17. Status: <span class="pill p-done">done</span>
+      <span class="pill p-part">partial / demo-depth</span>
+      <span class="pill p-future">roadmap (§20)</span>.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Deliverable (proposal §17)</th><th>Status</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td>Software Requirements Specification + architecture document</td><td><span class="pill p-done">done</span></td><td><span class="mono">docs/SRS.md</span>, <span class="mono">docs/architecture.md</span></td></tr>
+        <tr><td>Multi-agent orchestration engine</td><td><span class="pill p-done">done</span></td><td><span class="mono">app/orchestration/</span> + <span class="mono">app/agents/a01&ndash;a13</span></td></tr>
+        <tr><td>Model-agnostic LLM gateway</td><td><span class="pill p-done">done</span></td><td><span class="mono">app/llm/gateway.py</span> + 4 adapters</td></tr>
+        <tr><td>Adaptive Reliability&ndash;Creativity Controller (ARCOP)</td><td><span class="pill p-done">done</span></td><td><span class="mono">app/controller/arcop.py</span></td></tr>
+        <tr><td>Claim decomposition + risk graph module</td><td><span class="pill p-done">done</span></td><td><span class="mono">app/agents/a05</span>, <span class="mono">app/claimgraph/</span></td></tr>
+        <tr><td>Evidence retrieval, ranking, source-quality, contradiction</td><td><span class="pill p-done">done</span></td><td><span class="mono">app/retrieval/</span>, <span class="mono">a06&ndash;a09</span></td></tr>
+        <tr><td>Verification, revision, abstention, escalation pipeline</td><td><span class="pill p-done">done</span></td><td><span class="mono">a08, a11, a12</span> + <span class="mono">controller/consensus.py</span></td></tr>
+        <tr><td>Evaluation benchmark + automated harness</td><td><span class="pill p-done">done</span></td><td><span class="mono">data/benchmark/</span>, <span class="mono">app/eval/</span>, <span class="mono">scripts/eval_local.py</span></td></tr>
+        <tr><td>API service with OpenAPI / Swagger</td><td><span class="pill p-done">done</span></td><td><span class="mono">app/api/</span>, <span class="mono">GET /docs</span></td></tr>
+        <tr><td>Observability dashboard + structured audit traces</td><td><span class="pill p-done">done</span></td><td><span class="mono">frontend/</span>, <span class="mono">app/agents/a13</span>, <span class="mono">audit_traces</span> table</td></tr>
+        <tr><td>Deployment package (Docker; k8s if in scope)</td><td><span class="pill p-part">done / unverified on host</span></td><td><span class="mono">docker-compose.yml</span>, <span class="mono">deploy/k8s/</span></td></tr>
+        <tr><td>Technical docs, configuration guide, demo package</td><td><span class="pill p-done">done</span></td><td><span class="mono">README.md</span>, <span class="mono">tasks.ps1</span>, <span class="mono">scripts/serve_demo.py</span></td></tr>
+        <tr><td>Final project report (methodology, results, limitations)</td><td><span class="pill p-done">done</span></td><td><span class="mono">docs/final-report.md</span> + this document</td></tr>
+        <tr><td>Human-in-the-loop review queue (§20)</td><td><span class="pill p-done">done</span></td><td><span class="mono">app/api/routes_review.py</span>, dashboard <em>Review</em></td></tr>
+        <tr><td>Learned-from-feedback controller, multimodal, live-web freshness (§20)</td><td><span class="pill p-future">roadmap</span></td><td>documented; risk-model + calibrator retraining is wired</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="architecture"><span class="num">3</span>Architecture &amp; workflow</h2>
+    <p>
+      MA-AHAF is an <strong>adaptive orchestration layer</strong>. The application calls
+      <span class="mono">POST /v1/generate</span>; the layer returns a controlled response plus evidence,
+      per-claim risk, calibrated confidence, the policy vector, an action
+      (<span class="mono">answer / qualify / abstain / escalate</span>) and a full agent trace.
+    </p>
+    <pre class="mermaid">
+flowchart TD
+  R([Request]) --> I["1 · Intent &amp; Task Classifier"]
+  I --> RP["2 · Risk Profiler"]
+  RP --> PC["3 · Policy Controller — ARCOP<br/>6-parameter policy vector"]
+  PC --> PRE["Grounding-first retrieval<br/>(if policy demands)"]
+  PRE --> GEN["4 · Candidate Generator<br/>N candidates under policy"]
+  GEN --> DEC["5 · Claim Decomposer<br/>atomic claims + Claim Risk Graph"]
+  DEC --> RET["6 · Evidence Retrieval  +  7 · Source Quality"]
+  RET --> VER["8 · Verification  +  9 · Contradiction<br/>NLI / LLM judge · counterfactual probe"]
+  VER --> RISK["H(x) risk model · propagate on graph"]
+  RISK --> CRE["10 · Creativity assessment"]
+  CRE -- "needs revision" --> REV["11 · Revision<br/>creativity-preservation gate"]
+  REV --> DEC
+  CRE -- "ok / budget met" --> DECIDE["12 · Abstention / Escalation<br/>answer · qualify · abstain · escalate"]
+  DECIDE --> FIN["Finalize · segment answer · 13 · Audit"]
+  FIN --> OUT([Response + evidence + confidence + policy + trace])
+    </pre>
+    <p>
+      The canonical flow is a <strong>LangGraph state machine</strong>
+      (<span class="mono">app/orchestration/graph.py</span>, exposed as Mermaid at <span class="mono">GET /v1/graph</span>).
+      The runtime executes the same nodes through an explicit, debuggable bounded loop
+      (<span class="mono">app/orchestration/pipeline.py</span>) so state merging is never ambiguous. A single
+      pydantic <span class="mono">RequestState</span> object is threaded through every step.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>Layer</th><th>Responsibility</th><th>Components</th></tr></thead>
+      <tbody>
+        <tr><td>Input intelligence</td><td>Understand task, domain, stakes, ambiguity</td><td>Intent Classifier, Risk Profiler</td></tr>
+        <tr><td>Adaptive control</td><td>Choose the reliability&ndash;creativity operating point</td><td>ARCOP controller, policy engine, hallucination budget</td></tr>
+        <tr><td>Generation</td><td>Produce candidate responses under policy</td><td>LLM gateway, Candidate Generator</td></tr>
+        <tr><td>Claim analysis</td><td>Break output into verifiable units</td><td>Claim Decomposer, Claim Risk Graph</td></tr>
+        <tr><td>Evidence</td><td>Retrieve &amp; rank supporting / contradicting material</td><td>Hybrid retriever, reranker, source scorer</td></tr>
+        <tr><td>Verification</td><td>Test factuality, entailment, contradiction</td><td>Verification &amp; Contradiction agents, consensus engine</td></tr>
+        <tr><td>Response control</td><td>Revise, qualify, cite, abstain, preserve creativity</td><td>Revision agent, abstention gate</td></tr>
+        <tr><td>Observability</td><td>Track quality, cost, latency, failures</td><td>Metrics, traces, audit store, dashboard</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="lifecycle"><span class="num">4</span>Request lifecycle</h2>
+    <p>What actually happens when a prompt arrives, in order:</p>
+    <ol>
+      <li><strong>Redaction &amp; state.</strong> PII (email, phone, SSN, card, IP) is stripped
+        (<span class="mono">core/security.py</span>) before the prompt is stored or sent anywhere. A
+        <span class="mono">RequestState</span> and a per-request <span class="mono">UsageMeter</span> are created.</li>
+      <li><strong>Intent + risk.</strong> Zero-shot classification assigns a task type and ambiguity; the risk
+        profiler scores consequence, domain risk (medical / legal / financial / safety keyword hits),
+        numeric load and a task prior into a single request risk.</li>
+      <li><strong>Policy.</strong> ARCOP turns those signals into a six-parameter policy vector — grounding
+        intensity, verification depth, creativity allowance, citation requirement, abstention threshold,
+        escalation threshold — plus a candidate count. Tenant profile and bounded caller overrides apply.</li>
+      <li><strong>Grounding-first retrieval</strong> (only if grounding intensity is high): fetch
+        prompt-level context so the draft is grounded from the start rather than generate-then-check.</li>
+      <li><strong>Generation.</strong> The gateway's <em>generator</em> model produces N candidates; temperature
+        scales with creativity allowance. The most-cited / longest candidate becomes the working draft.</li>
+      <li><strong>Decomposition.</strong> An LLM extracts atomic, independently checkable claims; each is typed
+        (factual / numeric / causal / temporal / opinion / creative), scored for criticality and temporal
+        sensitivity, and linked into a Claim Risk Graph by shared entities.</li>
+      <li><strong>Evidence + source quality.</strong> Per non-creative claim: optional query expansion, then
+        hybrid retrieval (vector + BM25 &rarr; reciprocal-rank fusion &rarr; MMR &rarr; cross-encoder rerank),
+        including a search for <em>contradictory</em> evidence on risky claims. Each passage is scored for
+        authority, freshness, relevance, consistency and corroboration.</li>
+      <li><strong>Verification.</strong> NLI (local DeBERTa-v3, or the gateway verifier model as a batched
+        entailment judge) tests claim&nbsp;&#8872;&nbsp;evidence. Standard-and-deeper verification adds an
+        independent LLM verifier; deep verification adds a counterfactual probe (&ldquo;what evidence would
+        falsify this?&rdquo;) for critical claims. The contradiction agent scans for conflicting evidence and
+        internal inconsistency between claims.</li>
+      <li><strong>Risk scoring.</strong> The claim-level <span class="mono">H(x)</span> model produces a
+        calibrated risk per claim with a per-feature explanation; risk propagates along the graph's
+        dependency edges (bounded, never amplifying).</li>
+      <li><strong>Creativity.</strong> distinct-n, inter-candidate self-BLEU diversity and embedding novelty
+        vs the evidence centroid; explicitly creative spans are located and protected.</li>
+      <li><strong>Revision loop</strong> (bounded by <span class="mono">MAAHAF_MAX_REVISION_LOOPS</span>):
+        if critical claims are unsupported or high-risk, the reviser rewrites or hedges them while a
+        <em>creativity-preservation gate</em> shields <span class="mono">&lt;keep&gt;</span> spans, then the
+        draft is re-decomposed and re-verified.</li>
+      <li><strong>Decision.</strong> The abstention agent combines calibrated confidence, the hallucination
+        budget (near-zero for high-stakes), critical-unsupported count, agent disagreement and the policy
+        thresholds into one action, and segments the answer into factual / assumption / creative parts.</li>
+      <li><strong>Finalize + audit.</strong> The user-facing response is assembled (with an uncertainty banner
+        for <span class="mono">qualify</span>, a withhold message for <span class="mono">abstain</span>).
+        The audit agent records the full trace, agent votes and pinned model versions; escalations and
+        high-stakes abstentions enter the human-review queue.</li>
+    </ol>
+
+    <h2 id="agents"><span class="num">5</span>The 13 agents</h2>
+    <p>Every agent is an <span class="mono">Agent</span> subclass; orchestration only ever calls
+      <span class="mono">.run(state)</span>, which wraps the agent with timing, token accounting, telemetry
+      and a never-crash guard (<span class="mono">app/agents/base.py</span>).</p>
+    <div class="tw"><table>
+      <thead><tr><th>#</th><th>Agent · file</th><th>What it does</th><th>Technique</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><span class="mono">a01_intent_classifier</span></td><td>Task type (factual / analytical / creative / mixed / high-stakes) + ambiguity</td><td>Zero-shot NLI + high-stakes keyword override</td></tr>
+        <tr><td>2</td><td><span class="mono">a02_risk_profiler</span></td><td>Request risk from consequence, domain, numeric load, task prior</td><td>Interpretable scorer + zero-shot consequence</td></tr>
+        <tr><td>3</td><td><span class="mono">a03_policy_controller</span></td><td>Build the six-parameter policy vector; apply profile + overrides</td><td>ARCOP rule engine (+ optional learned blend)</td></tr>
+        <tr><td>4</td><td><span class="mono">a04_candidate_generator</span></td><td>N candidate responses; temperature / system prompt from policy</td><td>Gateway <em>generator</em> model + logprob uncertainty</td></tr>
+        <tr><td>5</td><td><span class="mono">a05_claim_decomposer</span></td><td>Atomic claims, types, criticality, entities; seed the Claim Risk Graph</td><td>LLM extraction + TF-IDF claim-type model</td></tr>
+        <tr><td>6</td><td><span class="mono">a06_evidence_retrieval</span></td><td>Support + contradictory evidence per claim; query expansion; cache</td><td>Hybrid RRF + MMR + cross-encoder</td></tr>
+        <tr><td>7</td><td><span class="mono">a07_source_quality</span></td><td>Authority / freshness / relevance / consistency / corroboration per passage</td><td>GradientBoosting regressor (+ weighted fallback)</td></tr>
+        <tr><td>8</td><td><span class="mono">a08_verification</span></td><td>claim &#8872; evidence; independent LLM verifier; counterfactual probe</td><td>DeBERTa-v3 NLI or LLM judge · dynamic depth</td></tr>
+        <tr><td>9</td><td><span class="mono">a09_contradiction</span></td><td>Conflicting evidence + internal inconsistency between claims</td><td>NLI contradiction · single batched LLM pass</td></tr>
+        <tr><td>10</td><td><span class="mono">a10_creativity</span></td><td>Novelty, diversity, whether creative intent is preserved</td><td>distinct-n · self-BLEU · embedding novelty</td></tr>
+        <tr><td>11</td><td><span class="mono">a11_revision</span></td><td>Rewrite / hedge unsupported spans; protect creative spans</td><td>Gateway <em>reviser</em> + <span class="mono">&lt;keep&gt;</span> gate</td></tr>
+        <tr><td>12</td><td><span class="mono">a12_abstention</span></td><td>answer / qualify / abstain / escalate; segment the answer</td><td>Calibrated confidence · budget · disagreement</td></tr>
+        <tr><td>13</td><td><span class="mono">a13_audit</span></td><td>Persist decisions, evidence, votes, pinned model versions</td><td>Structured trace assembly</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="controller"><span class="num">6</span>ARCOP &amp; the hallucination risk model</h2>
+    <h3>Adaptive Reliability&ndash;Creativity Operating Point (proposal §8)</h3>
+    <p>
+      <span class="mono">app/controller/arcop.py</span> computes a policy vector per request rather than
+      selecting a static mode:
+    </p>
+    <p class="lede mono">
+      &pi; = f(Risk, Intent, EvidenceCoverage, ClaimCriticality, Ambiguity, SourceAgreement,
+      CreativityDemand, ModelConfidence, Cost, Latency)
+    </p>
+    <p>
+      exposing <strong>grounding&nbsp;intensity</strong>, <strong>verification&nbsp;depth</strong>
+      (light / standard / deep), <strong>creativity&nbsp;allowance</strong>,
+      <strong>citation&nbsp;requirement</strong>, <strong>abstention&nbsp;threshold</strong> and
+      <strong>escalation&nbsp;threshold</strong>. The default is an interpretable rule / scoring engine;
+      a trained <span class="mono">policy.joblib</span> (MultiOutput GradientBoosting) can be blended
+      50/50 and is then re-clamped to the rule engine's safety floor so a poor learned policy can never
+      switch off verification, citation or abstention on a risky request. Tenant profiles
+      (<span class="mono">strict / balanced / creative</span>) and caller overrides (bounded to &le;&nbsp;0.3
+      loosening) adjust the vector.
+    </p>
+    <h3>Claim-level hallucination risk H(x) (proposal §9)</h3>
+    <p class="lede mono">
+      H(x) = w&#8321;(1&minus;EvidenceCoverage) + w&#8322;&middot;Contradiction + w&#8323;&middot;SourceRisk
+      + w&#8324;&middot;ModelUncertainty + w&#8325;&middot;ClaimCriticality + w&#8326;&middot;TemporalSensitivity
+      + w&#8327;&middot;AgentDisagreement
+    </p>
+    <p>
+      Implemented in <span class="mono">app/controller/risk_model.py</span> as a calibrated logistic model
+      whose coefficients are the learned <span class="mono">w&#8321;..w&#8327;</span>, with the proposal's
+      hand-set weights as a fallback. Every score returns normalised per-feature
+      <span class="mono">risk_contributions</span> — an explanation of <em>why</em> a claim is high risk —
+      and risk then propagates along the Claim Risk Graph's dependency edges. A separate
+      <strong>hallucination budget</strong> (<span class="mono">controller/budget.py</span>) sets a
+      context-specific tolerance for unsupported claims: ~0.05 for high-stakes, ~0.85 for creative.
+    </p>
+
+    <h2 id="stack"><span class="num">7</span>Technology stack</h2>
+    <div class="tw"><table>
+      <thead><tr><th>Area</th><th>Choice</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td>Language / backend</td><td>Python 3.11, FastAPI, Pydantic v2, <span class="mono">pydantic-settings</span></td><td>API service, typed config, request/response models</td></tr>
+        <tr><td>Orchestration</td><td>LangGraph <span class="mono">StateGraph</span> + explicit runtime loop</td><td>Canonical flow graph + debuggable execution</td></tr>
+        <tr><td>LLM gateway</td><td>Provider-agnostic adapter — OpenAI / local (Ollama, vLLM) / HF (flan-t5) / mock</td><td>Role &rarr; model routing, retries, token &amp; USD accounting</td></tr>
+        <tr><td>Vector search</td><td>PostgreSQL + <span class="mono">pgvector</span> (HNSW cosine index)</td><td>Dense retrieval, tenant-scoped</td></tr>
+        <tr><td>Keyword search</td><td>PostgreSQL FTS (<span class="mono">tsvector</span> + GIN)</td><td>Lexical retrieval for hybrid fusion</td></tr>
+        <tr><td>Database / ORM</td><td>PostgreSQL, SQLAlchemy 2.0, Alembic</td><td>Persistence, migrations</td></tr>
+        <tr><td>Cache / state</td><td>Redis (async for rate-limit, sync for evidence cache)</td><td>Evidence &amp; response caching, token buckets</td></tr>
+        <tr><td>Embeddings / rerank / NLI</td><td>sentence-transformers, <span class="mono">transformers</span>, PyTorch (CPU)</td><td>bge-small, MiniLM cross-encoder, DeBERTa-v3 NLI</td></tr>
+        <tr><td>Classic ML</td><td>scikit-learn, joblib, NumPy</td><td>Risk model, calibrator, claim-type, source-quality, policy</td></tr>
+        <tr><td>Graph</td><td>networkx</td><td>Claim Risk Graph, risk propagation, cytoscape export</td></tr>
+        <tr><td>Observability</td><td>OpenTelemetry, Prometheus client, structlog</td><td>Per-agent spans, metrics, JSON logs</td></tr>
+        <tr><td>Auth / security</td><td>python-jose (JWT), passlib, SHA-256 API-key hashes</td><td>API-key + JWT, RBAC, tenant isolation</td></tr>
+        <tr><td>Frontend</td><td>Vite, React 18, TypeScript, Tailwind, TanStack Query, Recharts, reactflow</td><td>Playground, traces, review queue, metrics, evaluation</td></tr>
+        <tr><td>Deployment</td><td>Docker Compose; Kubernetes manifests; k6 load test</td><td>Local stack + production reference</td></tr>
+        <tr><td>Tooling</td><td>pytest, ruff, mypy; GitHub Actions CI; <span class="mono">tasks.ps1</span> (Windows) / Makefile</td><td>Test, lint, type-check, task running</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="ml"><span class="num">8</span>ML / DL components</h2>
+    <p>Machine learning and deep learning are used throughout — not as a single verifier, but at every
+      layer where a signal can be learned. Each has a deterministic rule-based fallback so the system
+      runs offline with no downloads.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Component</th><th>Type</th><th>Model / method</th><th>Offline fallback</th></tr></thead>
+      <tbody>
+        <tr><td>Embeddings</td><td>DL</td><td><span class="mono">BAAI/bge-small-en-v1.5</span></td><td>Hashed bag-of-tokens (384-d)</td></tr>
+        <tr><td>Reranker</td><td>DL</td><td><span class="mono">cross-encoder/ms-marco-MiniLM-L-6-v2</span></td><td>Lexical overlap</td></tr>
+        <tr><td>Verification / contradiction</td><td>DL / LLM</td><td><span class="mono">DeBERTa-v3-base-mnli-fever-anli</span>, or gpt-4o-mini as a batched entailment judge</td><td>Overlap + negation heuristic</td></tr>
+        <tr><td>Intent &amp; task classifier</td><td>DL</td><td>Zero-shot <span class="mono">bart-large-mnli</span> / <span class="mono">deberta-v3-xsmall</span>; optional DistilBERT fine-tune</td><td>Keyword scoring</td></tr>
+        <tr><td>Claim-type classifier</td><td>ML</td><td>TF-IDF + Logistic Regression</td><td>LLM-provided type + alias map</td></tr>
+        <tr><td>Hallucination risk H(x)</td><td>ML</td><td>Isotonic-calibrated Logistic Regression over 7 signals; learned <span class="mono">w&#8321;..w&#8327;</span></td><td>Proposal's fixed weights</td></tr>
+        <tr><td>Confidence calibration</td><td>ML</td><td>Isotonic Regression; ECE reported</td><td>Power-law shrink</td></tr>
+        <tr><td>Source-quality scorer</td><td>ML</td><td>GradientBoosting regressor</td><td>Weighted sum</td></tr>
+        <tr><td>ARCOP policy</td><td>ML</td><td>MultiOutput GradientBoosting (learning-to-route)</td><td>Interpretable rule engine</td></tr>
+        <tr><td>Creativity scoring</td><td>DL / ML</td><td>distinct-1/2, self-BLEU, embedding novelty vs corpus centroid</td><td>distinct-n only</td></tr>
+      </tbody>
+    </table></div>
+    <p>Training scripts (<span class="mono">app/ml/train_*.py</span>) are synthetic-seeded via
+      <span class="mono">synth_data.py</span> so <span class="mono">bootstrap-models</span> works with no client
+      data. <span class="mono">retrain_from_eval.py</span> closes the loop: it refits the risk model and
+      calibrator from real evaluation labels on a held-out split.</p>
+
+    <h2 id="filemap"><span class="num">9</span>Repository map &mdash; what each file does</h2>
+    <p class="mono" style="font-size:12.5px;color:var(--muted)">ma-ahaf/ &mdash; monorepo · backend (Python) + frontend (React) + data + deploy + docs</p>
+
+    <h3>backend/app &mdash; application core</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">main.py</span></td><td>FastAPI factory; lifespan runs config validation (aborts on weak prod config) and OTel init; mounts all routers; <span class="mono">/health</span>, <span class="mono">/ready</span>, <span class="mono">/metrics</span>, <span class="mono">/v1/graph</span></td></tr>
+        <tr><td><span class="mono">config.py</span></td><td>pydantic-settings <span class="mono">Settings</span> (env prefix <span class="mono">MAAHAF_</span>); LLM role&rarr;model map + price table; <span class="mono">openai_api_key</span> (reads plain <span class="mono">OPENAI_API_KEY</span>); <span class="mono">nli_backend</span> auto/local/llm; <span class="mono">validate_for_runtime()</span> fatal-misconfig checks; CORS allow-list</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>backend/app/agents &mdash; the 13 agents</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">base.py</span></td><td><span class="mono">Agent</span> ABC; <span class="mono">run()</span> wraps <span class="mono">_run()</span> with timing, token accounting, telemetry, record append, never-crash guard</td></tr>
+        <tr><td><span class="mono">a01_intent_classifier.py</span></td><td>Zero-shot task type + ambiguity estimate; high-consequence keyword override forces the high-stakes route</td></tr>
+        <tr><td><span class="mono">a02_risk_profiler.py</span></td><td>Request risk from domain hits (medical/legal/financial/safety), a consequence classifier, numeric load and a per-task prior</td></tr>
+        <tr><td><span class="mono">a03_policy_controller.py</span></td><td>Builds <span class="mono">Signals</span>, calls ARCOP &rarr; <span class="mono">PolicyVector</span>; applies tenant profile and clamped caller overrides</td></tr>
+        <tr><td><span class="mono">a04_candidate_generator.py</span></td><td>N candidates via the gateway <em>generator</em> role; temperature from creativity allowance; context-only prompt when evidence is present; picks the most-cited candidate as the working draft</td></tr>
+        <tr><td><span class="mono">a05_claim_decomposer.py</span></td><td>LLM atomic-claim extraction &rarr; typed claims (+ TF-IDF claim-type model), criticality, temporal sensitivity, entities; builds the <span class="mono">ClaimGraph</span> with entity-sharing dependency edges; type validation + sentence-split fallback</td></tr>
+        <tr><td><span class="mono">a06_evidence_retrieval.py</span></td><td>Per non-creative claim: query expansion (if ambiguous) &rarr; hybrid retrieval of support <em>and</em> contradictory evidence; Redis evidence cache; coverage signal</td></tr>
+        <tr><td><span class="mono">a07_source_quality.py</span></td><td>Scores each passage on authority / freshness / relevance / consistency / corroboration &rarr; GBR model or weighted fallback &rarr; source score + source-agreement signal</td></tr>
+        <tr><td><span class="mono">a08_verification.py</span></td><td>NLI (or LLM judge) claim&#8872;evidence entailment / contradiction; independent LLM verifier at depth &ge; 1; counterfactual probe at depth 2 for critical claims; consensus-resolves the verdict</td></tr>
+        <tr><td><span class="mono">a09_contradiction.py</span></td><td>External: rescan evidence for contradictions (skipped when the LLM judge already did it). Internal: one batched LLM call to find contradicting claim pairs</td></tr>
+        <tr><td><span class="mono">a10_creativity.py</span></td><td>distinct-1/2, self-BLEU diversity across candidates, embedding novelty vs the evidence centroid &rarr; creativity score; locates explicitly creative spans</td></tr>
+        <tr><td><span class="mono">a11_revision.py</span></td><td>Rewrites / hedges unsupported or over-confident spans; <span class="mono">&lt;keep&gt;</span> gate protects creative spans; strips echoed scaffolding; discards degenerate rewrites; bounded loop counter</td></tr>
+        <tr><td><span class="mono">a12_abstention.py</span></td><td>Decision — answer / qualify / abstain / escalate — from calibrated confidence, hallucination budget, critical-unsupported count, disagreement, degenerate / weak-evidence checks; segments the answer into factual / assumption / creative</td></tr>
+        <tr><td><span class="mono">a13_audit.py</span></td><td>Assembles the full trace (signals, policy, candidates, claims, evidence, agent runs, model versions) onto the state for persistence</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>backend/app/controller &mdash; the adaptive brain</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">arcop.py</span></td><td><span class="mono">PolicyVector</span> (6 params) + <span class="mono">Signals</span>; interpretable rule engine; tenant profiles; optional learned policy blended and re-clamped to the safety floor</td></tr>
+        <tr><td><span class="mono">risk_model.py</span></td><td>Claim-level <span class="mono">H(x)</span>; calibrated LogReg artifact or fixed weights; per-feature <span class="mono">risk_contributions</span> explanation</td></tr>
+        <tr><td><span class="mono">budget.py</span></td><td>Hallucination budget per task type; <span class="mono">consumed()</span> counts only non-supported checkable claims, so answer length alone never trips the budget</td></tr>
+        <tr><td><span class="mono">calibration.py</span></td><td>Isotonic / power-law confidence calibration; <span class="mono">consistency_gap</span> (confidence vs evidence strength); <span class="mono">ece()</span></td></tr>
+        <tr><td><span class="mono">consensus.py</span></td><td>Verdict disagreement (normalised entropy); entailment-weighted verdict aggregation; request-level disagreement &rarr; escalation signal</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>backend/app/orchestration &mdash; the pipeline</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">state.py</span></td><td><span class="mono">RequestState</span> threaded through every step; <span class="mono">AgentRecord</span>, <span class="mono">ResponseSegment</span></td></tr>
+        <tr><td><span class="mono">graph.py</span></td><td>LangGraph <span class="mono">StateGraph</span> — the canonical §6 flow with the conditional revision edge; exposed as Mermaid</td></tr>
+        <tr><td><span class="mono">pipeline.py</span></td><td>Hand-rolled runtime executing the same nodes with an explicit, bounded loop; PII redaction; gateway + NLI wiring; persistence</td></tr>
+        <tr><td><span class="mono">nodes.py</span></td><td>Thin node wrappers around agents + pure aggregation (<span class="mono">n_risk_scoring</span> = score + propagate); <span class="mono">needs_revision</span> conditional; <span class="mono">n_finalize</span> assembles the user-facing response</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>backend/app/retrieval &mdash; evidence</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">embeddings.py</span></td><td>sentence-transformers <span class="mono">bge-small</span>; deterministic hash-embed fallback</td></tr>
+        <tr><td><span class="mono">vector_store.py</span></td><td>pgvector cosine search + chunk upsert (raw SQL, bound parameters)</td></tr>
+        <tr><td><span class="mono">keyword.py</span></td><td>PostgreSQL FTS <span class="mono">ts_rank_cd</span> lexical search</td></tr>
+        <tr><td><span class="mono">hybrid.py</span></td><td>Reciprocal-rank fusion of vector + keyword &rarr; MMR diversification &rarr; cross-encoder rerank</td></tr>
+        <tr><td><span class="mono">reranker.py</span></td><td>MiniLM cross-encoder; lexical-overlap fallback</td></tr>
+        <tr><td><span class="mono">query_expansion.py</span></td><td>LLM query reformulation for ambiguous / under-specified claims</td></tr>
+        <tr><td><span class="mono">cache.py</span></td><td>Sync Redis evidence cache; silent no-op if Redis is down</td></tr>
+        <tr><td><span class="mono">local_store.py</span></td><td>In-memory corpus index (real embeddings + BM25) so the full pipeline runs with no Postgres — used by demos and the eval</td></tr>
+        <tr><td><span class="mono">schema.py</span></td><td><span class="mono">Evidence</span> model</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>backend/app/llm &mdash; model-agnostic gateway</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">base.py</span></td><td><span class="mono">LLMAdapter</span> ABC, <span class="mono">LLMResponse</span> (text, tokens, logprobs, uncertainty)</td></tr>
+        <tr><td><span class="mono">gateway.py</span></td><td>Role &rarr; model router (generator / verifier / decomposer / reviser / judge / expander); retries; <span class="mono">UsageMeter</span> (tokens + USD); fence-tolerant <span class="mono">complete_json</span></td></tr>
+        <tr><td><span class="mono">openai_adapter.py</span></td><td>OpenAI chat + logprob-based uncertainty; key from settings</td></tr>
+        <tr><td><span class="mono">local_adapter.py</span></td><td>Any OpenAI-compatible endpoint (Ollama / vLLM) — used for verifier diversity</td></tr>
+        <tr><td><span class="mono">hf_adapter.py</span></td><td>Local <span class="mono">flan-t5</span> for every role; JSON coercion for weak models</td></tr>
+        <tr><td><span class="mono">mock_adapter.py</span></td><td>Deterministic offline adapter for tests</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>backend/app &mdash; supporting modules</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">nlp/nli.py</span></td><td>Entailment / contradiction: DeBERTa-v3 NLI locally, or the gateway verifier model as a batched judge; lexical heuristic offline</td></tr>
+        <tr><td><span class="mono">nlp/zeroshot.py</span></td><td>Zero-shot classification (bart-large-mnli / deberta-v3-xsmall); keyword fallback</td></tr>
+        <tr><td><span class="mono">claimgraph/schema.py</span></td><td><span class="mono">Claim</span>, <span class="mono">ClaimGraph</span> (<span class="mono">max_risk</span>, <span class="mono">critical_unsupported</span>)</td></tr>
+        <tr><td><span class="mono">claimgraph/graph.py</span></td><td>networkx build (claims &harr; entities &harr; evidence); bounded risk propagation; cytoscape export for the dashboard</td></tr>
+        <tr><td><span class="mono">ml/features.py</span></td><td>Shared feature extraction — <span class="mono">RISK_FEATURES</span> (w&#8321;..w&#8327; order), risk / source / policy vectors</td></tr>
+        <tr><td><span class="mono">ml/registry.py</span></td><td>Load <span class="mono">.joblib</span> artifacts with graceful rule-based fallback + cache</td></tr>
+        <tr><td><span class="mono">ml/synth_data.py</span></td><td>Synthetic labelled-data generators for every training script</td></tr>
+        <tr><td><span class="mono">ml/train_risk_model.py</span></td><td>Fit <span class="mono">risk_model.joblib</span> (calibrated LogReg + w&#8321;..w&#8327;)</td></tr>
+        <tr><td><span class="mono">ml/train_claim_type_clf.py</span></td><td>TF-IDF + LogReg claim-type classifier</td></tr>
+        <tr><td><span class="mono">ml/train_source_quality.py</span></td><td>GradientBoosting source-quality regressor</td></tr>
+        <tr><td><span class="mono">ml/train_policy.py</span></td><td>MultiOutput GBR learned ARCOP policy (learning-to-route)</td></tr>
+        <tr><td><span class="mono">ml/train_intent_clf.py</span></td><td>Optional DistilBERT fine-tune for intent classification</td></tr>
+        <tr><td><span class="mono">ml/retrain_from_eval.py</span></td><td>Refit risk model + calibrator from real eval labels (held-out split; AUC / Brier / ECE before-after; learned w&#8321;..w&#8327;); <span class="mono">--promote</span> installs it as the runtime default</td></tr>
+        <tr><td><span class="mono">core/logging.py</span></td><td>structlog JSON configuration</td></tr>
+        <tr><td><span class="mono">core/telemetry.py</span></td><td>OTel tracer init + Prometheus metrics (latency histograms, tokens, cost, verification depth, abstentions, disagreement, max claim risk)</td></tr>
+        <tr><td><span class="mono">core/security.py</span></td><td>JWT create / decode (algorithm allow-list), <span class="mono">require_role</span>, <span class="mono">redact_pii</span> (email / phone / SSN / card / IP)</td></tr>
+        <tr><td><span class="mono">core/ratelimit.py</span></td><td>Redis token bucket per API key; fails open with a warning + metric</td></tr>
+        <tr><td><span class="mono">core/errors.py</span></td><td>Error hierarchy + FastAPI exception handlers</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>backend/app/db &amp; app/api</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">db/models.py</span></td><td>SQLAlchemy ORM: <span class="mono">tenants</span>, <span class="mono">api_keys</span>, <span class="mono">documents</span>, <span class="mono">chunks</span> (HNSW + GIN tsvector), <span class="mono">requests</span>, <span class="mono">claims</span>, <span class="mono">agent_runs</span>, <span class="mono">audit_traces</span>, <span class="mono">eval_runs</span>, <span class="mono">escalation_queue</span></td></tr>
+        <tr><td><span class="mono">db/session.py</span></td><td>Engine + session factory (sync; the pipeline runs in a threadpool)</td></tr>
+        <tr><td><span class="mono">db/repositories.py</span></td><td>Persistence helpers; <span class="mono">persist_request</span> writes request + claims + runs + audit and queues escalations + high-stakes abstentions</td></tr>
+        <tr><td><span class="mono">db/cache.py</span></td><td>Async Redis client (rate-limit, response cache)</td></tr>
+        <tr><td><span class="mono">db/migrations/</span></td><td>Alembic env + <span class="mono">0001_init</span> (schema + FTS trigger + pgvector extension) + <span class="mono">0002_review_columns</span> (human-review columns)</td></tr>
+        <tr><td><span class="mono">api/deps.py</span></td><td>API-key &rarr; tenant / JWT &rarr; user auth, RBAC <span class="mono">requires(role)</span>, rate-limit hook</td></tr>
+        <tr><td><span class="mono">api/schemas.py</span></td><td>Request / response pydantic models (OpenAPI)</td></tr>
+        <tr><td><span class="mono">api/routes_generate.py</span></td><td><span class="mono">POST /v1/generate</span> — the main endpoint</td></tr>
+        <tr><td><span class="mono">api/routes_kb.py</span></td><td>KB ingest / search / list documents</td></tr>
+        <tr><td><span class="mono">api/routes_traces.py</span></td><td>List requests + fetch the full per-agent audit trace</td></tr>
+        <tr><td><span class="mono">api/routes_metrics.py</span></td><td>JSON metrics summary + pending escalations</td></tr>
+        <tr><td><span class="mono">api/routes_eval.py</span></td><td>Trigger + fetch evaluation runs</td></tr>
+        <tr><td><span class="mono">api/routes_review.py</span></td><td>Human-review queue: list / inspect / resolve; decision written into the audit trace</td></tr>
+        <tr><td><span class="mono">api/routes_admin.py</span></td><td>Tenants, API keys, policy profiles, JWT mint (returns 403 in prod)</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>backend/app/eval &amp; backend/scripts</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">eval/datasets.py</span></td><td>JSONL benchmark loader (merges <span class="mono">benchmark_*.jsonl</span> siblings); split by type</td></tr>
+        <tr><td><span class="mono">eval/metrics.py</span></td><td>Unsupported-claim rate, citation P/R, entailment accuracy, ECE / Brier, distinct-n / self-BLEU / novelty, reliability index</td></tr>
+        <tr><td><span class="mono">eval/baseline.py</span></td><td>Static-RAG baseline — same LLM + retriever, no adaptive control / verification / revision / abstention</td></tr>
+        <tr><td><span class="mono">eval/harness.py</span></td><td>DB-backed MA-AHAF vs baseline runner + aggregation + Pareto</td></tr>
+        <tr><td><span class="mono">eval/pareto.py</span></td><td>Non-dominated reliability&ndash;creativity frontier + frontier gain</td></tr>
+        <tr><td><span class="mono">scripts/serve_demo.py</span></td><td>Standalone no-DB FastAPI serving the full pipeline + the built dashboard on <span class="mono">:8000</span></td></tr>
+        <tr><td><span class="mono">scripts/demo.py</span></td><td>CLI end-to-end demo (mock or local models; no DB, no API key)</td></tr>
+        <tr><td><span class="mono">scripts/capture_traces.py</span></td><td>Runs prompts through the real pipeline and writes full traces to <span class="mono">demo_traces.json</span></td></tr>
+        <tr><td><span class="mono">scripts/eval_local.py</span></td><td>DB-less MA-AHAF vs static-RAG evaluation &rarr; <span class="mono">artifacts/eval/&lt;ts&gt;/</span> (report, pareto, training + calibration rows)</td></tr>
+        <tr><td><span class="mono">scripts/run_eval.py</span></td><td>DB-backed evaluation CLI</td></tr>
+        <tr><td><span class="mono">scripts/finalize_report.py</span></td><td>Fills <span class="mono">docs/final-report.md</span> §4 from the latest eval + retrain report</td></tr>
+        <tr><td><span class="mono">scripts/bootstrap_models.py</span></td><td>Downloads HF models + trains the sklearn artifacts</td></tr>
+        <tr><td><span class="mono">scripts/seed_kb.py</span> / <span class="mono">seed_benchmark.py</span></td><td>Load the corpus + benchmark into Postgres</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>frontend/src &mdash; the dashboard</h3>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">App.tsx</span></td><td>Nav shell + routes: Playground, Traces, Review, Metrics, Evaluation, Knowledge Base</td></tr>
+        <tr><td><span class="mono">api/client.ts</span></td><td>Typed <span class="mono">fetch</span> wrapper for every endpoint</td></tr>
+        <tr><td><span class="mono">pages/Playground.tsx</span></td><td>Prompt &rarr; live pipeline &rarr; segmented answer, claims table, evidence, policy radar, agent timeline</td></tr>
+        <tr><td><span class="mono">pages/Traces.tsx</span> / <span class="mono">TraceDetail.tsx</span></td><td>Request history + full per-agent trace + claim graph</td></tr>
+        <tr><td><span class="mono">pages/Review.tsx</span></td><td>Human-review queue — inspect and approve / revise / reject escalated responses</td></tr>
+        <tr><td><span class="mono">pages/Metrics.tsx</span></td><td>Latency, token, cost, abstention and verification-depth panels</td></tr>
+        <tr><td><span class="mono">pages/Evaluation.tsx</span></td><td>Trigger an eval run, Pareto scatter, deltas vs baseline</td></tr>
+        <tr><td><span class="mono">pages/KnowledgeBase.tsx</span></td><td>Search and browse the corpus</td></tr>
+        <tr><td><span class="mono">components/</span></td><td>PolicyRadar, ClaimGraphView, AgentTimeline, ClaimsTable, SegmentedAnswer, ParetoScatter, UI primitives</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>data · deploy · docs · root</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Path</th><th>Contents</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">data/corpus/</span></td><td>143 knowledge-base documents — 13 ACME product / policy docs + 130 general-knowledge docs across 13 domains (physics, chemistry, biology, astronomy, geography, world history, computer science, AI/ML, mathematics, health, economics, business, law)</td></tr>
+        <tr><td><span class="mono">data/benchmark/*.jsonl</span></td><td>77 labelled prompts — type, reference answer, gold evidence spans, <span class="mono">answerable</span> flag; 8 high-stakes items deliberately un-answerable</td></tr>
+        <tr><td><span class="mono">deploy/k8s/</span></td><td>namespace, ConfigMap, Secret template, API Deployment (HPA / PodDisruptionBudget / non-root / read-only rootfs), Postgres StatefulSet + Redis, frontend + Ingress (TLS / WAF) + egress NetworkPolicy</td></tr>
+        <tr><td><span class="mono">deploy/loadtest/k6.js</span></td><td>k6 load-test script</td></tr>
+        <tr><td><span class="mono">docs/</span></td><td><span class="mono">SRS.md</span> (FR-1..FR-22), <span class="mono">architecture.md</span>, <span class="mono">evaluation-methodology.md</span>, <span class="mono">final-report.md</span> (measured results), <span class="mono">security-review.md</span> (S-1..S-10)</td></tr>
+        <tr><td><span class="mono">observability/</span></td><td>Prometheus config, Grafana dashboard + datasource, OTel collector config</td></tr>
+        <tr><td><span class="mono">docker-compose.yml</span></td><td>db (pgvector) · redis · api · frontend, plus an <span class="mono">obs</span> profile (Prometheus, Grafana, OTel collector)</td></tr>
+        <tr><td><span class="mono">tasks.ps1</span> / <span class="mono">Makefile</span></td><td>Task runners — <span class="mono">setup</span>, <span class="mono">test</span>, <span class="mono">lint</span>, <span class="mono">dashboard-openai</span>, <span class="mono">eval-openai</span>, <span class="mono">retrain</span>, <span class="mono">up</span>, <span class="mono">seed</span>, &hellip;</td></tr>
+        <tr><td><span class="mono">.env.example</span> · <span class="mono">README.md</span> · <span class="mono">SECURITY.md</span></td><td>Config template, quickstart, security controls + go-live checklist</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="api"><span class="num">10</span>API surface</h2>
+    <div class="tw"><table>
+      <thead><tr><th>Endpoint</th><th>Purpose</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">POST /v1/generate</span></td><td>Main adaptive endpoint — returns response, segments, claims[], evidence[], confidence, calibrated_confidence, action, policy_vector, trace_id</td><td>operator</td></tr>
+        <tr><td><span class="mono">GET /v1/traces</span> · <span class="mono">/v1/traces/{id}</span></td><td>List requests · full per-agent audit trace with votes and pinned model versions</td><td>viewer</td></tr>
+        <tr><td><span class="mono">POST /v1/kb/documents</span> · <span class="mono">/v1/kb/search</span> · <span class="mono">GET /v1/kb/documents</span></td><td>Ingest, search, list knowledge-base documents (tenant-scoped)</td><td>operator / viewer</td></tr>
+        <tr><td><span class="mono">GET /v1/metrics/summary</span> · <span class="mono">/v1/metrics/escalations</span></td><td>Dashboard metrics · pending escalations</td><td>viewer / operator</td></tr>
+        <tr><td><span class="mono">POST /v1/eval/run</span> · <span class="mono">GET /v1/eval/runs</span></td><td>Trigger and fetch evaluation runs</td><td>operator</td></tr>
+        <tr><td><span class="mono">GET /v1/review/queue</span> · <span class="mono">POST /v1/review/queue/{id}/resolve</span></td><td>Human-review queue — inspect, approve / revise / reject</td><td>operator</td></tr>
+        <tr><td><span class="mono">GET /v1/graph</span></td><td>Orchestration graph as a Mermaid definition</td><td>ops</td></tr>
+        <tr><td><span class="mono">GET /health</span> · <span class="mono">/ready</span> · <span class="mono">/metrics</span> · <span class="mono">/docs</span></td><td>Liveness · readiness (DB + Redis) · Prometheus text · Swagger UI</td><td>&mdash;</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="eval"><span class="num">11</span>Evaluation &amp; results</h2>
+    <h3>Methodology</h3>
+    <p>
+      <strong>Systems.</strong> <em>MA-AHAF</em> (the full 13-agent pipeline) vs a <em>static-RAG baseline</em>
+      — the same generator model and the same hybrid retriever, top-5 passages in context, but no adaptive
+      control, verification, revision or abstention. Both use the identical retrieval stack and generator, so
+      the delta isolates the adaptive attenuation layer.
+    </p>
+    <p>
+      <strong>Benchmark.</strong> 77 labelled prompts over a 13-document corpus, across five task types
+      (factual 31, high-stakes 17, analytical 12, creative 10, mixed 7). 8 high-stakes items are deliberately
+      un-answerable from the corpus, to test calibrated abstention. Run on <span class="mono">gpt-4o-mini</span>
+      for generation, decomposition, verification and revision, with local <span class="mono">bge-small</span>
+      + BM25 + cross-encoder retrieval; 76 / 77 items completed (one timed out during a transient network drop).
+    </p>
+    <h3>Results</h3>
+    <div class="kpis">
+      <div class="kpi good"><div class="k-lbl">Calibration · ECE</div><div class="k-val">0.066 <span class="arrow">&larr; 0.191</span></div><div class="k-sub">&minus;65% error · Brier 0.194&rarr;0.145</div></div>
+      <div class="kpi good"><div class="k-lbl">Abstention rate</div><div class="k-val">15.8% <span class="arrow">&larr; 0%</span></div><div class="k-sub">all on un-answerable high-stakes items</div></div>
+      <div class="kpi"><div class="k-lbl">Unsupported-claim rate</div><div class="k-val">0.183 <span class="arrow">&#8776; 0.179</span></div><div class="k-sub">flat — generator already well grounded</div></div>
+      <div class="kpi cost"><div class="k-lbl">Latency / cost per req</div><div class="k-val">31.5s <span class="arrow">&larr; 3.5s</span></div><div class="k-sub">~$0.0014 vs ~$0.0001 (&times;9&ndash;14)</div></div>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>Metric</th><th class="tnum">Static-RAG</th><th class="tnum">MA-AHAF</th><th class="tnum">&Delta;</th><th>Target (§15)</th></tr></thead>
+      <tbody>
+        <tr><td>Calibration error (ECE)</td><td class="tnum">0.191</td><td class="tnum">0.066</td><td class="tnum delta-up">&minus;0.125</td><td>lower &check;</td></tr>
+        <tr><td>Brier score</td><td class="tnum">0.194</td><td class="tnum">0.145</td><td class="tnum delta-up">&minus;0.049</td><td>lower &check;</td></tr>
+        <tr><td>Abstention rate (overall)</td><td class="tnum">0.000</td><td class="tnum">0.158</td><td class="tnum delta-up">+0.158</td><td>&gt; 0 on un-answerable &check;</td></tr>
+        <tr><td>Unsupported-claim rate</td><td class="tnum">0.179</td><td class="tnum">0.183</td><td class="tnum delta-flat">+0.004</td><td>lower — flat here</td></tr>
+        <tr><td>Answer-correct</td><td class="tnum">0.789</td><td class="tnum">0.763</td><td class="tnum delta-flat">&minus;0.026</td><td>higher — ~equal</td></tr>
+        <tr><td>Citation recall (symmetric)</td><td class="tnum">0.821</td><td class="tnum">0.829</td><td class="tnum delta-up">+0.008</td><td>higher &check;</td></tr>
+        <tr><td>Creativity (creative split)</td><td class="tnum">&mdash;</td><td class="tnum">0.808</td><td class="tnum delta-flat">retained</td><td>not collapsed &check;</td></tr>
+        <tr><td>Pareto frontier gain</td><td class="tnum">&mdash;</td><td class="tnum">0.053</td><td class="tnum delta-up">&gt; 0</td><td>&gt; 0 &check;</td></tr>
+        <tr><td>Latency p50 (s)</td><td class="tnum">3.5</td><td class="tnum">31.5</td><td class="tnum delta-down">&times;9</td><td>reported</td></tr>
+        <tr><td>Cost per request (USD)</td><td class="tnum">~0.0001</td><td class="tnum">~0.0014</td><td class="tnum delta-down">&times;14</td><td>reported</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Interpretation</h3>
+    <p>
+      <strong>Genuine wins.</strong> Confidence calibration improves markedly and MA-AHAF abstains only where
+      it cannot ground the answer — the proposal's core §5 / §10 objectives. Unsupported-claim rate is
+      <em>flat</em> because with <span class="mono">gpt-4o-mini</span> as the generator the raw answers are
+      already fairly grounded on this benchmark, so there is little headroom — the value there is the
+      abstention on the cases it cannot ground, not a lower rate on the cases it answers.
+    </p>
+    <div class="note warn">
+      <b>Two apparent regressions are metric artifacts, not real.</b>
+      <b>Citation precision</b> (0.82&rarr;0.15 in the raw run): the two systems are not scored the same way —
+      the baseline number is answer-level entailment, the MA-AHAF number is true claim-level precision over
+      every decomposed atomic claim. Scored symmetrically, citation <em>recall</em> is 0.82&rarr;0.83.
+      <b>Creativity</b> (0.99&rarr;0.65 in the raw run): the baseline generates one candidate, so its self-BLEU
+      is 0 and its diversity term is a free 1.0; MA-AHAF pays real inter-candidate self-BLEU. On the creative
+      split MA-AHAF scores 0.808 — creative quality is retained. The full <span class="mono">docs/final-report.md</span>
+      §4.2 carries the detail.
+    </div>
+    <h3>Retraining loop</h3>
+    <p>
+      <span class="mono">retrain_from_eval.py</span> refit the risk model (213 claim rows, held-out
+      <strong>AUC 0.751</strong>; dominant predictors of an unsupported claim: <em>agent disagreement</em>
+      and <em>source risk</em>) and the calibrator (ECE 0.106&nbsp;&rarr;&nbsp;~0). The retrained artifacts are
+      <strong>archived, not shipped as the runtime default</strong> — 213 rows on a 13-document benchmark is
+      far too little to trust (the fit collapsed the missing-evidence weight to zero). This pass proves the
+      loop is wired end-to-end; a production run needs the &ge; 500-prompt client benchmark from §5.
+    </p>
+
+    <h2 id="security"><span class="num">12</span>Security &amp; governance</h2>
+    <div class="tw"><table>
+      <thead><tr><th>Control (proposal §18)</th><th>Implementation</th></tr></thead>
+      <tbody>
+        <tr><td>Tenant isolation</td><td>Every DB read / write scoped by <span class="mono">tenant_id</span>; no cross-tenant path found in review</td></tr>
+        <tr><td>Auth &amp; RBAC</td><td>API-key (SHA-256 hashed) + JWT (jose, explicit algorithm allow-list); rank check <span class="mono">viewer &lt; operator &lt; admin</span> on every protected route</td></tr>
+        <tr><td>PII redaction</td><td><span class="mono">redact_pii()</span> runs before any prompt / context is persisted or sent through the pipeline; matched types recorded on the audit trace</td></tr>
+        <tr><td>Config safety</td><td>Startup <em>aborts</em> in prod on weak <span class="mono">JWT_SECRET</span>, <span class="mono">dev-key</span>, <span class="mono">provider=mock</span> or a localhost DB URL</td></tr>
+        <tr><td>Secrets</td><td>Environment only; <span class="mono">.env</span> git-ignored; <span class="mono">.env.example</span> holds placeholders; External Secrets Operator wiring shown in <span class="mono">deploy/k8s/</span></td></tr>
+        <tr><td>Rate limiting</td><td>Per-key Redis token bucket; fails open with a warning + <span class="mono">maahaf_rate_limiter_errors_total</span> metric</td></tr>
+        <tr><td>External retrieval</td><td>Off by default (<span class="mono">MAAHAF_ALLOW_EXTERNAL_RETRIEVAL</span>); k8s NetworkPolicy restricts egress to Postgres / Redis / OTel / :443 / DNS</td></tr>
+        <tr><td>Container hardening</td><td>Non-root, read-only root filesystem, all capabilities dropped, no privilege escalation</td></tr>
+        <tr><td>Audit integrity</td><td>Every response's trace pins <span class="mono">model_versions</span>; human-review decisions are appended to the trace, not overwritten</td></tr>
+        <tr><td>CORS</td><td><span class="mono">*</span> only in <span class="mono">dev</span>; allow-list from <span class="mono">MAAHAF_CORS_ORIGINS</span> otherwise</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      <span class="mono">docs/security-review.md</span> logs findings S-1..S-10 (all medium / low / info, all
+      fixed or documented). A third-party penetration test and secret-manager integration are on the
+      go-live checklist in <span class="mono">SECURITY.md</span>.
+      <b>Note:</b> the OpenAI key was pasted into a tracked file during development — it lives only in the
+      git-ignored <span class="mono">.env</span> now, and rotating it is recommended.
+    </p>
+
+    <h2 id="run"><span class="num">13</span>How to run it</h2>
+    <h3>Live dashboard on gpt-4o-mini (no Docker)</h3>
+    <pre class="cmd"><span class="c"># backend\.env must contain OPENAI_API_KEY=sk-...</span>
+.\tasks.ps1 dashboard-openai      <span class="c"># builds the UI, serves it + the pipeline on :8000</span>
+<span class="c"># open http://localhost:8000  ->  Playground tab  ->  type any prompt</span></pre>
+    <h3>Everything else</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><span class="mono">.\tasks.ps1 setup</span></td><td>Create the venv, install backend dependencies</td></tr>
+        <tr><td><span class="mono">.\tasks.ps1 test</span> · <span class="mono">lint</span></td><td>pytest (30 tests) · ruff</td></tr>
+        <tr><td><span class="mono">.\tasks.ps1 demo</span></td><td>Instant mock end-to-end demo (no downloads, no key)</td></tr>
+        <tr><td><span class="mono">.\tasks.ps1 capture</span></td><td>Write 5 real gpt-4o-mini traces to <span class="mono">demo_traces.json</span></td></tr>
+        <tr><td><span class="mono">.\tasks.ps1 eval-openai</span></td><td>Full 77-item evaluation on gpt-4o-mini</td></tr>
+        <tr><td><span class="mono">.\tasks.ps1 retrain</span></td><td>Refit risk model + calibrator from the latest eval labels</td></tr>
+        <tr><td><span class="mono">python -m scripts.finalize_report</span></td><td>Write the measured numbers into <span class="mono">docs/final-report.md</span> §4</td></tr>
+        <tr><td><span class="mono">.\tasks.ps1 up</span> / <span class="mono">up-obs</span></td><td>Docker Compose stack (+ Prometheus / Grafana / OTel)</td></tr>
+        <tr><td><span class="mono">GET /docs</span></td><td>Swagger UI — every endpoint with schemas</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="limits"><span class="num">14</span>Limitations &amp; next steps</h2>
+    <ul>
+      <li><strong>Benchmark scale.</strong> 77 synthetic items on a 13-document corpus — directional, not
+        representative of a production domain. A real engagement needs a client corpus and &ge; 500
+        human-labelled prompts.</li>
+      <li><strong>Same judge family.</strong> On the OpenAI path the generator and the entailment judge are
+        both <span class="mono">gpt-4o-mini</span>. Point <span class="mono">MAAHAF_LLM__VERIFIER_MODEL</span> at
+        a different family, or set <span class="mono">MAAHAF_NLI_BACKEND=local</span>, before quoting headline
+        numbers. The production k8s ConfigMap already sets <span class="mono">local</span>.</li>
+      <li><strong>Eval metric symmetry.</strong> Citation-precision and creativity are scored differently for
+        the two systems (see §11). Making them symmetric is a small, worthwhile fix.</li>
+      <li><strong>Production stack unverified on a host.</strong> Docker / Kubernetes were not exercised on a
+        live cluster in this engagement (no Docker on the build machine); the manifests are a reference.</li>
+      <li><strong>Learned ARCOP policy.</strong> Still trained on synthetic data; only the risk model and
+        calibrator are refit from real eval labels in this pass.</li>
+      <li><strong>Roadmap (§20):</strong> learning-to-route controller from production feedback, personalised
+        policies, multimodal verification, live web-freshness monitoring, domain-expert agents.</li>
+    </ul>
+
+    <footer>
+      <span>MA-AHAF prototype delivery report</span>
+      <span>generated 2026-09-01 · gpt-4o-mini eval · 30 tests green</span>
+    </footer>
+  </main>
+</div>

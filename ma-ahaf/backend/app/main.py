@@ -16,6 +16,7 @@ from app.api import (
     routes_generate,
     routes_kb,
     routes_metrics,
+    routes_review,
     routes_traces,
 )
 from app.config import settings
@@ -30,6 +31,12 @@ log = get_logger("main")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     configure_logging()
+    problems = settings.validate_for_runtime()
+    if problems:
+        for p in problems:
+            log.error("config.invalid", problem=p)
+        if settings.is_prod:
+            raise RuntimeError("refusing to start with invalid production config: " + "; ".join(problems))
     init_telemetry(app)
     log.info("startup", version=__version__, env=settings.env, llm_provider=settings.llm.provider)
     yield
@@ -49,13 +56,15 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.env == "dev" else ["http://localhost:5173"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["authorization", "content-type", "x-api-key"],
 )
 
 install_error_handlers(app)
-for module in (routes_generate, routes_kb, routes_traces, routes_metrics, routes_eval, routes_admin):
+for module in (routes_generate, routes_kb, routes_traces, routes_metrics, routes_eval,
+               routes_review, routes_admin):
     app.include_router(module.router)
 
 

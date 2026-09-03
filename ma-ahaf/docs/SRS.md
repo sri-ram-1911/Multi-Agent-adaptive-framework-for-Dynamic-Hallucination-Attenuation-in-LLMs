@@ -33,6 +33,8 @@ be, while maintaining a transparent audit trail.
 | FR-18 | Evaluation harness: MA-AHAF vs static-RAG baseline + Pareto frontier | `eval/` |
 | FR-19 | Model-agnostic gateway: swap models per role without code changes | `llm/gateway.py` |
 | FR-20 | Configurable policy profiles per tenant; bounded caller overrides | `controller/arcop.py`, `api/routes_admin.py` |
+| FR-21 | Human-in-the-loop review queue: list, inspect, approve/revise/reject escalated responses; decision written back to the audit trace | `api/routes_review.py`, dashboard **Review** page |
+| FR-22 | Retrain `risk_model` + `calibrator` from real evaluation labels (NLI-judged) on a held-out split | `scripts/eval_local.py`, `app/ml/retrain_from_eval.py` |
 
 ## 3. Non-functional requirements
 
@@ -66,9 +68,23 @@ be, while maintaining a transparent audit trail.
 - Operational visibility into latency, token usage, verification depth, failure
   modes.
 
-## 5. Out of scope for the prototype (proposal §20 future extensions)
+## 5. Delivery status (2026-09-01)
 
-Learned-from-production routing controller; multimodal verification; live web
-freshness monitoring; per-user personalised policies; Kubernetes production
-manifests; full enterprise DLP; human-review queue UI (escalations are recorded;
-the queue endpoint exists, the reviewer UI is a stub).
+**Done & verified:** all 22 functional requirements implemented; 30+ tests pass;
+ruff clean; human-review queue + UI; config validation + prod startup guard;
+security review (`docs/security-review.md`); k8s manifests + k6 load test + CI
+security scanning; benchmark grown to 77 items; DB-less eval + retrain-from-eval
+loop.
+
+**Blocked in this engagement:**
+- GPT-4o eval numbers — supplied OpenAI account had **$0 credits**; the eval and
+  final report were produced with the local open-weight config instead. Re-run
+  `MAAHAF_LLM__PROVIDER=openai python -m scripts.eval_local --limit 77` to fill in.
+- `docker compose` / Kubernetes validation on a live host — **no Docker
+  available** on the build machine; the manifests are unrun.
+
+**Still recommended for production (proposal §20 + review):** learned-from-
+production ARCOP policy; multimodal verification; live web-freshness monitoring;
+per-user personalised policies; per-tenant token budget; secret-manager
+integration; third-party penetration test; ≥500-item human-labelled benchmark on
+the client's own corpus.

@@ -1,0 +1,6 @@
+{
+  "title": "The Software Development Lifecycle",
+  "source": "technology",
+  "authority": 0.76,
+  "text": "The software development lifecycle (SDLC) describes the stages of building software: requirements gathering, design, implementation (coding), testing, deployment, and maintenance. Common methodologies include Waterfall (sequential, linear phases) and Agile (iterative, incremental development with frequent feedback, often organized into sprints). Version control systems like Git help teams track and coordinate code changes throughout the process."
+}

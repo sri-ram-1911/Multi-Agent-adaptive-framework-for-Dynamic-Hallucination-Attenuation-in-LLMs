@@ -10,16 +10,28 @@ import time
 from sqlalchemy.orm import Session
 
 from app.llm.gateway import Gateway, UsageMeter
-from app.retrieval.hybrid import HybridRetriever
 
 _SYS = "Answer the question using the context. If unsure, answer anyway with your best guess."
 
+# optional module-level override for DB-less eval (set by scripts.eval_local)
+_LOCAL_CORPUS = None
 
-def static_rag(db: Session, tenant_id: str, prompt: str) -> dict:
+
+def set_local_corpus(corpus) -> None:  # noqa: ANN001
+    global _LOCAL_CORPUS
+    _LOCAL_CORPUS = corpus
+
+
+def static_rag(db: Session | None, tenant_id: str, prompt: str) -> dict:
     t0 = time.perf_counter()
     meter = UsageMeter()
     gw = Gateway(meter)
-    evs = HybridRetriever(db).retrieve(prompt, tenant_id=tenant_id, rerank_k=5)
+    if db is None and _LOCAL_CORPUS is not None:
+        evs = _LOCAL_CORPUS.retrieve(prompt, rerank_k=5)
+    else:
+        from app.retrieval.hybrid import HybridRetriever
+
+        evs = HybridRetriever(db).retrieve(prompt, tenant_id=tenant_id, rerank_k=5)
     context = "\n---\n".join(f"[S{i+1}] {e.text}" for i, e in enumerate(evs))
     resp = gw.complete(
         "generator",

@@ -4,12 +4,14 @@ import { Evaluation } from "./pages/Evaluation";
 import { KnowledgeBase } from "./pages/KnowledgeBase";
 import { Metrics } from "./pages/Metrics";
 import { Playground } from "./pages/Playground";
+import { Review } from "./pages/Review";
 import { TraceDetail } from "./pages/TraceDetail";
 import { Traces } from "./pages/Traces";
 
 const NAV = [
   ["/", "Playground"],
   ["/traces", "Traces"],
+  ["/review", "Review"],
   ["/metrics", "Metrics"],
   ["/evaluation", "Evaluation"],
   ["/kb", "Knowledge Base"],
@@ -53,6 +55,7 @@ export default function App() {
           <Route path="/" element={<Playground />} />
           <Route path="/traces" element={<Traces />} />
           <Route path="/traces/:id" element={<TraceDetail />} />
+          <Route path="/review" element={<Review />} />
           <Route path="/metrics" element={<Metrics />} />
           <Route path="/evaluation" element={<Evaluation />} />
           <Route path="/kb" element={<KnowledgeBase />} />

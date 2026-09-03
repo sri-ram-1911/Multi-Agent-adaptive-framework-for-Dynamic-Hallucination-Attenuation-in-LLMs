@@ -1,0 +1,6 @@
+{
+  "title": "Number Systems: Binary and Decimal",
+  "source": "mathematics",
+  "authority": 0.76,
+  "text": "The decimal (base-10) system, using digits 0-9, is the standard number system in everyday human use. Computers, however, operate using the binary (base-2) system, using only digits 0 and 1, because digital circuits naturally represent two states (on/off). Other number systems used in computing include octal (base-8) and hexadecimal (base-16), often used as compact representations of binary data."
+}

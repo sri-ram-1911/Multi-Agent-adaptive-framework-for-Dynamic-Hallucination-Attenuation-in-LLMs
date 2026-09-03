@@ -64,7 +64,13 @@ def set_policy_profile(
 
 @router.post("/token")
 def issue_token(body: TokenRequest, db: Session = Depends(get_db)) -> dict:
-    """Dev helper: mint a dashboard JWT for a tenant (guard behind SSO in prod)."""
+    """Dev helper: mint a dashboard JWT for a tenant. Disabled in prod — wire an
+    OIDC/SSO provider and exchange its token for a MA-AHAF JWT instead."""
+    from app.config import settings
+    from app.core.errors import Forbidden
+
+    if settings.is_prod:
+        raise Forbidden("token minting is disabled in prod; use the SSO integration")
     t = db.scalar(select(models.Tenant).where(models.Tenant.name == body.tenant))
     if t is None:
         raise NotFound("tenant not found")

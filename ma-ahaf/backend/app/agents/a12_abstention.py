@@ -123,12 +123,16 @@ class Abstention(Agent):
                 f"with {len(critical_unsupported)} critical unsupported claim(s)"
             )
         elif critical_unsupported or over or gap > 0.25:
+            bits = []
+            if critical_unsupported:
+                bits.append(f"{len(critical_unsupported)} claim(s) lack sufficient evidence")
+            if gap > 0.25:
+                bits.append(f"confidence-evidence gap {gap:.2f}")
+            if over:
+                bits.append(f"risk budget {used:.2f}/{limit:.2f} exceeded")
             action, reason = "qualify", (
-                "answer delivered with explicit uncertainty: "
-                + (f"{len(critical_unsupported)} claims lack sufficient evidence; " if critical_unsupported else "")
-                + (f"confidence-evidence gap {gap:.2f}; " if gap > 0.25 else "")
-                + (f"risk budget {used:.2f}/{limit:.2f}" if over else "")
-            ).strip()
+                "answer delivered with explicit uncertainty: " + "; ".join(bits)
+            )
         else:
             action, reason = "answer", "evidence sufficient and consistent"
 

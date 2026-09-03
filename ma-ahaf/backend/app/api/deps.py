@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import secrets
 from dataclasses import dataclass
 
 from fastapi import Depends, Header, Request
@@ -36,8 +37,8 @@ async def get_principal(
 ) -> Principal:
     # 1) API key
     if x_api_key:
-        await check_rate_limit(_hash_key(x_api_key))
-        if x_api_key == settings.dev_api_key:
+        await check_rate_limit(_hash_key(x_api_key), limit=settings.rate_limit_per_min)
+        if not settings.is_prod and secrets.compare_digest(x_api_key, settings.dev_api_key):
             tenant = get_tenant_by_name(db, "default")
             if tenant is None:
                 raise Unauthorized("default tenant not seeded; run `make seed`")

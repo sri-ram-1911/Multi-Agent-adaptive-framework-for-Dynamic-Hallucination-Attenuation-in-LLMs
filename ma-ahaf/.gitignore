@@ -31,3 +31,11 @@ frontend/.vite/
 Thumbs.db
 .idea/
 .vscode/
+
+# local run outputs
+demo_traces.json
+*.log
+artifacts_eval*.log
+backend/artifacts/
+backend/artifacts_eval*.log
+data/corpus_bench/

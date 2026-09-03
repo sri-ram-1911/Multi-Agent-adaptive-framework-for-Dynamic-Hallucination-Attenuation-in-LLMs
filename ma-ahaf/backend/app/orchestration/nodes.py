@@ -76,7 +76,7 @@ def n_pre_retrieve(s: RequestState) -> RequestState:
     """Selective grounding-first retrieval (proposal §11): when the policy calls for
     high grounding, fetch prompt-level context so the draft is grounded from the
     start instead of generate-then-check. Skipped for creativity-first requests."""
-    if not s.policy or s.policy.grounding_intensity < 0.55 or s.db is None:
+    if not s.policy or s.policy.grounding_intensity < 0.45 or s.db is None:
         return s
     from app.retrieval.hybrid import HybridRetriever
 
@@ -133,13 +133,22 @@ def n_finalize(s: RequestState) -> RequestState:
     """Assemble the user-facing response from the (possibly revised) draft."""
     draft = s.chosen_candidate
     if s.action == "abstain":
+        no_evidence = "no retrieved passage is relevant" in (s.action_reason or "")
         missing = "; ".join(c.text for c in s.claim_graph.critical_unsupported()[:3])
-        s.final_response = (
-            "I don't have sufficient reliable evidence to answer this confidently.\n\n"
-            f"Specifically, these points could not be verified: {missing}.\n\n"
-            "You could narrow the question, provide a source, or ask for a best-effort "
-            "answer explicitly labelled as unverified."
-        )
+        if no_evidence or not missing:
+            s.final_response = (
+                "I don't have sufficient reliable evidence in the knowledge base to "
+                "answer this confidently, so I'm not going to guess.\n\n"
+                "You could add a relevant source to the knowledge base, narrow the "
+                "question, or ask for a best-effort answer explicitly labelled as unverified."
+            )
+        else:
+            s.final_response = (
+                "I don't have sufficient reliable evidence to answer this confidently.\n\n"
+                f"Specifically, these points could not be verified: {missing}.\n\n"
+                "You could narrow the question, provide a source, or ask for a best-effort "
+                "answer explicitly labelled as unverified."
+            )
         s.segments = [ResponseSegment(kind="assumption", text=s.final_response)]
     elif s.action in ("qualify", "escalate"):
         banner = {

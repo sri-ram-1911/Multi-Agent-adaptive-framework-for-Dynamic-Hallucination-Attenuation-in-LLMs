@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ma-ahaf-config
+  namespace: ma-ahaf
+data:
+  MAAHAF_ENV: "prod"
+  MAAHAF_LOG_LEVEL: "INFO"
+  MAAHAF_LLM__PROVIDER: "openai"
+  MAAHAF_LLM__GENERATOR_MODEL: "gpt-4o-mini"
+  MAAHAF_LLM__VERIFIER_MODEL: "gpt-4o-mini"
+  MAAHAF_LLM__DECOMPOSER_MODEL: "gpt-4o-mini"
+  MAAHAF_LLM__REVISER_MODEL: "gpt-4o-mini"
+  MAAHAF_LLM__JUDGE_MODEL: "gpt-4o"
+  # entailment scoring runs on the local DeBERTa-v3 NLI model (baked into the
+  # image) rather than the generator family, so verification does not share the
+  # generator's blind spots. Set to "llm" to use the verifier model instead.
+  MAAHAF_NLI_BACKEND: "local"
+  MAAHAF_ALLOW_EXTERNAL_RETRIEVAL: "false"
+  MAAHAF_PII_REDACTION: "true"
+  MAAHAF_MAX_REVISION_LOOPS: "2"
+  MAAHAF_RATE_LIMIT_PER_MIN: "120"
+  MAAHAF_CORS_ORIGINS: "https://maahaf.example.com"
+  MAAHAF_OTEL_ENABLED: "true"
+  MAAHAF_OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.observability:4317"
+  HF_HOME: "/models"

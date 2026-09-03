@@ -53,6 +53,10 @@ def run_pipeline(
     state.db = db
     state.gateway = Gateway(meter)
 
+    from app.nlp import nli as _nli
+
+    _nli.set_gateway(state.gateway)  # enables the LLM-backed NLI path
+
     # --- input intelligence + adaptive control ---
     N.n_intent(state)
     N.n_risk(state)
@@ -64,7 +68,9 @@ def run_pipeline(
     N.n_decompose(state)
 
     # --- evidence + verification, with bounded revision loop ---
-    while True:
+    from app.config import settings as _s
+
+    for _ in range(_s.max_revision_loops + 2):  # hard ceiling; never spin
         N.n_retrieve(state)
         N.n_verify(state)
         N.n_risk_scoring(state)

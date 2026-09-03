@@ -41,11 +41,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.2", "pytest-asyncio>=0.23", "ruff>=0.5", "mypy>=1.10", "types-redis"]
+dev = ["pytest>=8.2", "pytest-asyncio>=0.23", "ruff>=0.5", "mypy>=1.10", "types-redis", "python-docx>=1.1"]
 
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+# doc generator: prose content strings, not application logic
+extend-exclude = ["scripts/gen_report.py"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "C4", "SIM"]
 ignore = ["B008"]  # FastAPI Depends in defaults

@@ -1,0 +1,6 @@
+{
+  "title": "Generative AI and Large Language Models",
+  "source": "technology-ai",
+  "authority": 0.76,
+  "text": "Generative AI refers to systems that can create new content -- text, images, audio, or code -- rather than just analyzing existing data. Large language models (LLMs), trained on vast amounts of text, are a prominent form of generative AI capable of producing human-like text, answering questions, and assisting with writing and coding. LLMs can occasionally generate plausible-sounding but factually incorrect content, a phenomenon known as hallucination."
+}

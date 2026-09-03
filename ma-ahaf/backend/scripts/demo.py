@@ -80,7 +80,7 @@ def _install_local_retrieval() -> None:
     corpus = LocalCorpus.from_dir(CORPUS_DIR)
 
     def n_pre_retrieve(state):
-        if not state.policy or state.policy.grounding_intensity < 0.55:
+        if not state.policy or state.policy.grounding_intensity < 0.45:
             return state
         state.evidence = corpus.retrieve(state.prompt, k=8, rerank_k=5)
         return state

@@ -15,7 +15,10 @@ class OpenAIAdapter(LLMAdapter):
     provider = "openai"
 
     def __init__(self) -> None:
-        self._client = OpenAI(timeout=settings.llm.request_timeout_s)
+        self._client = OpenAI(
+            api_key=settings.openai_api_key,  # falls back to env var if None
+            timeout=settings.llm.request_timeout_s,
+        )
 
     @retry(
         stop=stop_after_attempt(settings.llm.max_retries),

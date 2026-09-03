@@ -65,7 +65,7 @@ class Verification(Agent):
                 entail_scores.append(0.0)
 
             # independent LLM verifier for standard+ depth or critical claims
-            if passages and (depth >= 1 or claim.criticality >= 0.7):
+            if settings.verifier_llm_enabled and passages and (depth >= 1 or claim.criticality >= 0.7):
                 data = state.gateway.complete_json(
                     "verifier",
                     [
@@ -82,7 +82,7 @@ class Verification(Agent):
                     entail_scores.append(0.7 if v == "supported" else 0.2)
 
             # counterfactual probe for deep depth on critical claims
-            if depth >= 2 and claim.criticality >= 0.6 and passages:
+            if settings.verifier_llm_enabled and depth >= 2 and claim.criticality >= 0.6 and passages:
                 cf = state.gateway.complete_json(
                     "verifier",
                     [
@@ -103,9 +103,14 @@ class Verification(Agent):
             claim.model_uncertainty = round(1.0 - state.signals.model_confidence, 3)
             verified += 1
 
+        nli_label = (
+            f"nli:{state.gateway.model_for('verifier')}"
+            if settings.effective_nli_backend == "llm"
+            else settings.nli_model
+        )
         return (
             {"verified": verified, "depth": depth,
              "verdicts": {c.text[:60]: c.verdict for c in state.claim_graph.claims}},
             f"verified {verified} claims at depth {depth}",
-            f"{settings.nli_model} + {state.gateway.model_for('verifier')}",
+            f"{nli_label} + {state.gateway.model_for('verifier')}",
         )

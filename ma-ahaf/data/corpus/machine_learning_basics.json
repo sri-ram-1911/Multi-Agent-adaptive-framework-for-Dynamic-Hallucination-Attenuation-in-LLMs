@@ -1,0 +1,6 @@
+{
+  "title": "Machine Learning Basics",
+  "source": "technology-ai",
+  "authority": 0.76,
+  "text": "Machine learning is a subset of AI in which systems learn patterns from data rather than following explicitly programmed rules. Supervised learning trains models on labeled data (input-output pairs) to make predictions; unsupervised learning finds patterns in unlabeled data (such as clustering); reinforcement learning trains agents through trial and error using rewards and penalties. Common algorithms include decision trees, regression, and neural networks."
+}

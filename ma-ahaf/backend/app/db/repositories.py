@@ -44,10 +44,14 @@ def persist_request(db: Session, payload: dict[str, Any]) -> models.Request:
                 escalated=audit.get("escalated", False),
             )
         )
-    if payload.get("action") == "escalate":
+    # queue for human review: any escalation, plus a high-stakes abstention
+    if payload.get("action") == "escalate" or (
+        payload.get("action") == "abstain" and payload.get("task_type") == "high_stakes"
+    ):
         db.add(
             models.EscalationQueue(
-                request_id=req.id, tenant_id=req.tenant_id, reason="agent_disagreement_or_high_risk"
+                request_id=req.id, tenant_id=req.tenant_id,
+                reason=payload.get("action_reason") or "agent_disagreement_or_high_risk",
             )
         )
     db.flush()

@@ -1,0 +1,6 @@
+{
+  "title": "How the Internet Works",
+  "source": "technology",
+  "authority": 0.78,
+  "text": "The internet is a global network of interconnected computer networks that communicate using standardized protocols, primarily TCP/IP. Data is broken into small packets, routed across intermediate networks via routers, and reassembled at the destination. Domain Name System (DNS) servers translate human-readable domain names (like example.com) into numerical IP addresses that computers use to locate each other."
+}

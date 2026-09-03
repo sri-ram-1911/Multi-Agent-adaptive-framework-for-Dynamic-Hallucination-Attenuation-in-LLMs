@@ -83,8 +83,25 @@ switch ($Target) {
     Write-Host "`n  DASHBOARD  ->  http://localhost:8000   (real local models)`n" -ForegroundColor Green
     Invoke-Backend @("-m", "scripts.serve_demo") -EnvVars @{ HF_HUB_OFFLINE = "1"; TRANSFORMERS_OFFLINE = "1" }
   }
+  "dashboard-openai" {
+    Initialize-Venv
+    $fe = Join-Path $Root "frontend"
+    if (-not (Test-Path (Join-Path $fe "dist\index.html"))) {
+      Push-Location $fe; if (-not (Test-Path "node_modules")) { npm install }; npm run build; Pop-Location
+    }
+    if (-not (Test-Path (Join-Path $Backend ".env"))) {
+      Write-Host "backend\.env missing - put OPENAI_API_KEY=sk-... in it first" -ForegroundColor Yellow; exit 1
+    }
+    Write-Host "`n  DASHBOARD  ->  http://localhost:8000   (gpt-4o-mini)`n" -ForegroundColor Green
+    Invoke-Backend @("-m", "scripts.serve_demo") -EnvVars @{ MAAHAF_LLM__PROVIDER = "openai"; MAAHAF_MAX_REVISION_LOOPS = "1"; OMP_NUM_THREADS = "4"; MKL_NUM_THREADS = "4"; HF_HUB_OFFLINE = "1"; TRANSFORMERS_OFFLINE = "1" }
+  }
+  "serve-openai"   { Initialize-Venv; Invoke-Backend @("-m", "scripts.serve_demo") -EnvVars @{ MAAHAF_LLM__PROVIDER = "openai"; MAAHAF_MAX_REVISION_LOOPS = "1"; OMP_NUM_THREADS = "4"; MKL_NUM_THREADS = "4"; HF_HUB_OFFLINE = "1"; TRANSFORMERS_OFFLINE = "1" } }
+  "eval-openai"    { Initialize-Venv; Invoke-Backend @("-m", "scripts.eval_local", "--limit", "77", "--timeout", "180") -EnvVars @{ MAAHAF_LLM__PROVIDER = "openai"; HF_HUB_OFFLINE = "1"; TRANSFORMERS_OFFLINE = "1" } }
+  "capture"        { Initialize-Venv; Invoke-Backend @("-m", "scripts.capture_traces") -EnvVars @{ MAAHAF_LLM__PROVIDER = "openai"; MAAHAF_MAX_REVISION_LOOPS = "1" } }
   "bootstrap-models" { Initialize-Venv; Invoke-Backend @("-m", "scripts.bootstrap_models") }
   "eval"           { Initialize-Venv; Invoke-Backend @("-m", "scripts.run_eval", "--dataset", "data/benchmark/benchmark.jsonl") }
+  "eval-local"     { Initialize-Venv; Invoke-Backend @("-m", "scripts.eval_local", "--limit", "40") -EnvVars @{ HF_HUB_OFFLINE = "1"; TRANSFORMERS_OFFLINE = "1" } }
+  "retrain"        { Initialize-Venv; Invoke-Backend @("-m", "app.ml.retrain_from_eval") }
   "up"             { if (-not (Test-Path (Join-Path $Root ".env"))) { Copy-Item (Join-Path $Root ".env.example") (Join-Path $Root ".env"); Write-Host "created .env - set OPENAI_API_KEY" -ForegroundColor Yellow }; docker compose -f (Join-Path $Root "docker-compose.yml") up -d --build; docker compose -f (Join-Path $Root "docker-compose.yml") exec -T api alembic upgrade head }
   "up-obs"         { docker compose -f (Join-Path $Root "docker-compose.yml") --profile obs up -d --build }
   "down"           { docker compose -f (Join-Path $Root "docker-compose.yml") --profile obs down }
@@ -101,11 +118,15 @@ MA-AHAF task runner (Windows)
   .\tasks.ps1 demo              instant mock demo (no downloads)
   .\tasks.ps1 demo-real         real ML/DL demo, local flan-t5-base (offline)
   .\tasks.ps1 demo-large        real demo with flan-t5-large
-  .\tasks.ps1 dashboard         VISUAL: build + serve the dashboard at http://localhost:8000
+  .\tasks.ps1 dashboard         VISUAL: build + serve the dashboard at http://localhost:8000 (mock)
   .\tasks.ps1 dashboard-real    same, but with real local models (slower)
+  .\tasks.ps1 dashboard-openai  same, running the pipeline on gpt-4o-mini (needs backend\.env)
   .\tasks.ps1 serve             just the no-DB demo API on :8000
+  .\tasks.ps1 capture           write 5 real gpt-4o-mini traces to demo_traces.json
   .\tasks.ps1 bootstrap-models  download HF models + train sklearn artifacts
-  .\tasks.ps1 eval              run the evaluation harness
+  .\tasks.ps1 eval-local        MA-AHAF vs baseline eval, no Postgres -> artifacts/eval/
+  .\tasks.ps1 eval-openai       full 77-item eval on gpt-4o-mini
+  .\tasks.ps1 retrain           retrain risk_model + calibrator from the latest eval labels
   .\tasks.ps1 up / up-obs / down / migrate / seed     docker compose stack
 "@
   }

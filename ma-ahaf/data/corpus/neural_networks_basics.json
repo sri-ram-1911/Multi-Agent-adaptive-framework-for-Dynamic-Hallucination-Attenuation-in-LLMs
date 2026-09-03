@@ -1,0 +1,6 @@
+{
+  "title": "Neural Networks Basics",
+  "source": "technology-ai",
+  "authority": 0.76,
+  "text": "An artificial neural network is a machine learning model loosely inspired by the structure of biological brains, consisting of layers of interconnected nodes ('neurons') that process and transform data. Deep learning refers to neural networks with many layers, enabling them to learn complex patterns from large datasets. Neural networks power applications including image recognition, speech recognition, and natural language processing."
+}

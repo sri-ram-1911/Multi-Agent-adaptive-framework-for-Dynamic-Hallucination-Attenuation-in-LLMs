@@ -29,21 +29,30 @@ def build_nx(cg: ClaimGraph) -> nx.DiGraph:
 
 
 def propagate_risk(cg: ClaimGraph, *, decay: float = 0.5) -> ClaimGraph:
-    """If claim A depends on B, A inherits a fraction of B's risk."""
+    """If claim A depends on B, A cannot be considered *less* risky than a
+    decayed fraction of its riskiest dependency.
+
+    This is a bounded floor, not an accumulator: a claim's risk is lifted toward
+    ``decay * max(dependency risk)`` but never pushed above it, so a well-grounded
+    claim stays low-risk even in a densely connected graph and the propagated
+    value can never exceed the true maximum claim risk already present.
+    """
     g = build_nx(cg)
     by_id = {c.id: c for c in cg.claims}
     try:
         order = list(nx.topological_sort(g.subgraph([c.id for c in cg.claims])))
     except nx.NetworkXUnfeasible:
         order = [c.id for c in cg.claims]
+    base_risk = {c.id: c.risk_score for c in cg.claims}
     for cid in order:
         claim = by_id.get(cid)
         if claim is None:
             continue
-        for dep in cg.dependencies.get(cid, []):
-            if dep in by_id:
-                claim.risk_score = min(1.0, max(claim.risk_score,
-                                                claim.risk_score + decay * by_id[dep].risk_score))
+        deps = [d for d in cg.dependencies.get(cid, []) if d in by_id]
+        if not deps:
+            continue
+        dep_risk = max(by_id[d].risk_score for d in deps)
+        claim.risk_score = round(min(1.0, max(base_risk[cid], decay * dep_risk)), 4)
     return cg
 
 

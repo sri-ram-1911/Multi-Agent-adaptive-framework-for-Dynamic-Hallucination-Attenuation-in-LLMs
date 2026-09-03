@@ -13,11 +13,28 @@ from typing import Any
 
 
 def load_jsonl(path: str) -> list[dict[str, Any]]:
+    """Load a JSONL benchmark file, or every ``*.jsonl`` in a directory.
+
+    When ``path`` names a file inside a directory that also holds sibling
+    ``benchmark_*.jsonl`` files, those are merged in too (de-duped by ``id``).
+    """
     p = Path(path)
-    if not p.exists():
+    files: list[Path]
+    if p.is_dir():
+        files = sorted(p.glob("*.jsonl"))
+    elif p.exists():
+        files = [p, *sorted(f for f in p.parent.glob("benchmark_*.jsonl") if f != p)]
+    else:
         raise FileNotFoundError(f"benchmark not found: {path} (run `make seed`)")
-    with p.open(encoding="utf-8") as f:
-        return [json.loads(line) for line in f if line.strip()]
+
+    rows: dict[str, dict[str, Any]] = {}
+    for f in files:
+        with f.open(encoding="utf-8") as fh:
+            for line in fh:
+                if line.strip():
+                    obj = json.loads(line)
+                    rows[str(obj.get("id", f"{f.name}:{len(rows)}"))] = obj
+    return list(rows.values())
 
 
 def split_by_type(rows: list[dict]) -> dict[str, list[dict]]:

@@ -1,0 +1,6 @@
+{
+  "title": "Database Basics",
+  "source": "technology",
+  "authority": 0.76,
+  "text": "A database is an organized collection of structured data, typically managed by a database management system (DBMS). Relational databases (like PostgreSQL, MySQL) organize data into tables with rows and columns, linked by keys, and are queried using SQL. NoSQL databases (like MongoDB, Redis) offer flexible schemas for unstructured or high-velocity data. Databases underpin nearly all modern software applications."
+}

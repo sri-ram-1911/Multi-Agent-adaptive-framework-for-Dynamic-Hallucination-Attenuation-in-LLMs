@@ -60,7 +60,7 @@ ESCALATIONS: list[dict] = []
 
 # ---- wire the pipeline to the in-memory corpus (same as scripts/demo.py) ----
 def _pre_retrieve(s):
-    if s.policy and s.policy.grounding_intensity >= 0.55:
+    if s.policy and s.policy.grounding_intensity >= 0.45:
         s.evidence = CORPUS.retrieve(s.prompt, k=8, rerank_k=5)
     return s
 
@@ -149,10 +149,15 @@ async def generate(body: GenerateRequest, request: Request):
     state.__dict__["_created_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
     trace = _state_to_trace(state)
     REQUESTS[state.request_id] = trace
-    if state.action == "escalate":
-        ESCALATIONS.append({"id": str(uuid.uuid4()), "request_id": state.request_id,
-                            "reason": state.action_reason, "created_at": trace["_created_at"]
-                            if "_created_at" in trace else trace["created_at"]})
+    if state.action == "escalate" or (state.action == "abstain" and state.task_type == "high_stakes"):
+        ESCALATIONS.append({
+            "id": str(uuid.uuid4()), "request_id": state.request_id,
+            "reason": state.action_reason, "status": "pending",
+            "created_at": trace["created_at"], "prompt": trace["prompt"][:240],
+            "action": state.action, "calibrated_confidence": state.calibrated_confidence,
+            "max_claim_risk": trace["max_claim_risk"], "agent_disagreement": state.agent_disagreement,
+            "task_type": state.task_type, "decision": None, "reviewed_by": None,
+        })
     cg = state.claim_graph
     u = state.__dict__.get("_usage")
     log.info("demo.generate", action=state.action, ms=int((time.time() - t0) * 1000))
@@ -230,7 +235,54 @@ def metrics_summary(hours: int = 168):
 
 @app.get("/v1/metrics/escalations")
 def escalations():
-    return ESCALATIONS
+    return [e for e in ESCALATIONS if e["status"] == "pending"]
+
+
+@app.get("/v1/review/queue")
+def review_queue(status: str = "pending"):
+    return [e for e in ESCALATIONS if status == "all" or e["status"] == status]
+
+
+@app.get("/v1/review/queue/stats")
+def review_stats():
+    return {"pending": sum(e["status"] == "pending" for e in ESCALATIONS),
+            "reviewed": sum(e["status"] == "reviewed" for e in ESCALATIONS)}
+
+
+@app.get("/v1/review/queue/{item_id}")
+def review_item(item_id: str):
+    e = next((x for x in ESCALATIONS if x["id"] == item_id), None)
+    if not e:
+        return {"error": {"message": "not found"}}
+    t = REQUESTS.get(e["request_id"], {})
+    return {**e, "final_response": t.get("final_response"), "policy_vector": t.get("policy_vector", {}),
+            "claims": t.get("claims", []), "claim_graph": t.get("claim_graph"),
+            "model_versions": t.get("model_versions", {}), "review_note": e.get("review_note")}
+
+
+@app.post("/v1/review/queue/{item_id}/resolve")
+def review_resolve(item_id: str, body: dict):
+    e = next((x for x in ESCALATIONS if x["id"] == item_id), None)
+    if not e:
+        return {"error": {"message": "not found"}}
+    decision = body.get("decision")
+    if decision not in ("approved", "revised", "rejected"):
+        return {"error": {"message": "decision must be approved|revised|rejected"}}
+    e["status"] = "reviewed"
+    e["decision"] = decision
+    e["review_note"] = body.get("note", "")
+    e["reviewed_by"] = "demo-reviewer"
+    t = REQUESTS.get(e["request_id"])
+    if t:
+        if decision == "revised" and body.get("revised_response"):
+            t["final_response"] = body["revised_response"]
+            t["action"] = "answer"
+        elif decision == "rejected":
+            t["final_response"] = "Withheld by human reviewer. " + body.get("note", "")
+            t["action"] = "abstain"
+        elif decision == "approved":
+            t["action"] = "answer"
+    return {"id": item_id, "status": "reviewed", "decision": decision}
 
 
 @app.get("/v1/kb/documents")
@@ -342,4 +394,5 @@ if __name__ == "__main__":
     else:
         print("dashboard not built yet — run:  cd frontend && npm install && npm run build")
     print("API docs  -> http://localhost:8000/docs\n")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # demo server has NO auth — bind to loopback only
+    uvicorn.run(app, host="127.0.0.1", port=8000)

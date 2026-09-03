@@ -128,5 +128,7 @@ class Gateway:
                     return json.loads(raw[start : end + 1])
                 except json.JSONDecodeError:
                     pass
-            log.warning("gateway.json_parse_failed", role=role, raw=raw[:200])
+            # NOTE: the completion can contain user/evidence content — log only a
+            # short, structural preview and never the full text.
+            log.warning("gateway.json_parse_failed", role=role, preview=raw[:80], length=len(raw))
             return {}
